@@ -1,0 +1,108 @@
+\chapter{Error Bound for Nonlinear ODE}\label{chapter:error-bound-for-nonlinear-ode}
+    Nonlinear ODEs can be hard to solve and bound in general.
+    In this work, we only deal with nonlinear ODEs with a single nonlinear term of the form $\varepsilon v^k(t)$, where $\varepsilon \in \mathbb{R}$ controls the strength of the nonlinearity.
+    Ideally, a nonlinear term with $|\varepsilon| \ll 1$ is easier to solve and bound, which is assumption of our derivations. 
+    With the perturbation technique, we obtain a family of solutions $v(t;\varepsilon)$ parameterized by $\varepsilon$ at the cost of solving a (countable) collection of equations. 
+    As explained below in section \ref{section:perturbation-theory}, we train finitely many networks, each approximately solving an equation in the collection.
+
+\section{Perturbation Theory} \label{section:perturbation-theory}
+    Consider the nonlinear ODE with nonlinear term $\varepsilon v^k(t)$,
+    {
+        \begin{equation} \label{eq:nonlinear-ode-master}
+            \L v(t) + \varepsilon v^k(t) = f(t),
+        \end{equation}
+    }
+    where $\L$ is a linear differential operator discussed in \ref{section:error-bound-for-linear-odes} and initial conditions are specified for the system at time $t=0$. 
+    Notice that each $\varepsilon \in \mathbb{R}$ corresponds to a solution $v(t; \varepsilon)$. 
+    We expand the solution $v(t; \varepsilon)$ in terms of $\varepsilon$
+    {   
+        \begin{equation} \label{eq:nonlinear-solution-expansion}
+            v(t; \varepsilon) = \sum_{j=0}^{\infty} \varepsilon^j v_j(t) = v_0(t) + \varepsilon v_1(t) + \dots
+        \end{equation}
+    }
+    Only $v_0(t)$ is subject to the original initial conditions at $t=0$, while other components, $v_1$, $v_2$, \dots, have initial conditions of $0$ at $t=0$.
+    Substituting Eq. \eqref{eq:nonlinear-solution-expansion} into Eq. \eqref{eq:nonlinear-ode-master}, there is
+    {
+        \begin{gather}
+            \L \sum_{j=0}^{\infty} \varepsilon^j v_j + \varepsilon \left(\sum_{j=0}^{\infty} \varepsilon^j v_j\right)^k = f \\
+            % \sum_{j=0}^{\infty} \varepsilon^j \L v_j + \varepsilon \left(\sum_{j=0}^{\infty} \varepsilon^j v_j\right)^k = f \\
+            \sum_{j=0}^{\infty} \varepsilon^j \L v_j + \sum_{j=0}^{\infty} \varepsilon^{j+1} \sum_{\substack{j_1+\dots+j_k = j\\j_1, \dots, j_k \geq 0}}v_{j_1}\dots v_{j_k} = f \\[-0.5em]
+            \L v_0 + \sum_{j=1}^{\infty} \varepsilon^j \Bigg(\L v_j + \sum_{\substack{j_1+\dots+j_k = j - 1\\j_1, \dots, j_k \geq 0}}v_{j_1}\dots v_{j_k}\Bigg)= f \label{eq:nonlinear-equation-expansion} 
+        \end{gather}
+    }
+    In order for Eq. \eqref{eq:nonlinear-equation-expansion} to hold true for all $\varepsilon$, the coefficients for each $\varepsilon^j$ must match on both sides of Eq. \eqref{eq:nonlinear-equation-expansion}. Hence,
+    {
+        \begin{alignat}{6}
+            &\L v_0 &&= f \label{eq:expansion-epsilon-0}\\
+            &\L v_1 + v_0^k &&= 0 \label{eq:expansion-epsilon-1}\\
+            &\L v_2 + k v_0^{k-1}v_1 &&= 0 \label{eq:expansion-epsilon-2} \\
+            &\L v_3 + \frac{k(k-1)}{2} v_0^{k-2}v_1^2 + k v_0^{k-1}v_2 &&= 0 \label{eq:expansion-epsilon-3} \\[-1em]
+            &\vdots &&\phantom{=}\,\,\,\,\vdots\nonumber
+        \end{alignat}
+    }
+
+    For $\varepsilon = 0$, Eq. \eqref{eq:nonlinear-solution-expansion} is reduced to $v_0(t)$, which solves the linear problem $\L v=f$. 
+
+    \begingroup
+        \setlength{\itemsep}{0pt}
+        \setlength{\parskip}{0pt}
+        The above system can be solved in a \textit{sequential} manner, either analytically or using neural networks,
+        \begin{enumerate}
+            \item Eq. \eqref{eq:expansion-epsilon-0} is linear in $v_0$ and can be solved first. 
+            \item With $v_0$ known, Eq. \eqref{eq:expansion-epsilon-1} is linear in $v_1$ and can be solved for $v_1$. 
+            \item Similarly, with $v_0$ and $v_1$ known, Eq. \eqref{eq:expansion-epsilon-2} is linear in $v_2$ and can be solved for $v_2$.
+            \item The process can be repeated for Eq. \eqref{eq:expansion-epsilon-3} and beyond. Only a linear ODE is solved each time.
+        \end{enumerate}
+        To solve the system with PINNs, we approximate exact solutions $\left\{v_j(t)\right\}_{j=1}^{\infty}$ with neural network solutions $\left\{u_j(t)\right\}_{j=0}^{J}$ trained sequentially on Eq. \eqref{eq:expansion-epsilon-0}, Eq. \eqref{eq:expansion-epsilon-1}, and beyond. 
+        In practice, we only consider components up to order $J$ to avoid the infinity in expansion \eqref{eq:nonlinear-solution-expansion}. 
+        Ideally, $J$ should be large enough so that higher order residuals in expansion \eqref{eq:nonlinear-solution-expansion} can be neglected.
+    \endgroup
+
+    After obtaining $\left\{u_j(t)\right\}_{j=0}^{J}$, we can reconstruct the solution $u(t;\varepsilon) = \sum_{j=0}^{J} \varepsilon^j u_j(t)$ to the original nonlinear equation \eqref{eq:nonlinear-ode-master} for varying $\varepsilon$.
+    See Alg. \ref{alg:nonlinear-iterative} for details.
+
+\section{Expansion of Bounds}
+    The absolute error $|\Err(t;\varepsilon)| = |u(t;\varepsilon) - v(t;\varepsilon)|$is given by 
+    {
+        \begin{align}
+            |\Err(t; \varepsilon)| %&= \big|u(t; \varepsilon) - v(t; \varepsilon)\big| \nonumber \\[-0.25em]
+            &= \left|\sum_{j=0}^{J} \varepsilon^{j} \Big(u_j(t) - v_j(t)\Big) - \sum_{j=J+1}^{\infty} \varepsilon^j v_j(t)\right| \nonumber \\[-0.5em]
+            &\leq \sum_{j=0}^{J} \Big|\Err_{j}(t)\Big||\varepsilon|^j + \left|\sum_{j=J+1}^{\infty}\varepsilon^j v_j(t)\right| 
+        \end{align}
+    }
+    where $\Err_{j}(t) := u_j(t) - v_j(t)$ is the \textit{component error} between $u_j(t)$ and $v_j(t)$.
+    Let $\Bound_{j}$ denote the \textit{bound component} such that $|\Err_{j}(t)| \leq \Bound_j(t)$.
+    Assuming $J$ is large and higher order terms $\left|\sum_{j=J+1}^{\infty}\varepsilon^j v_j(t)\right|$ are negligible, there is 
+    {
+        \begin{equation} \label{eq:nonlinear-bound-components}
+            \Big|\Err(t; \varepsilon)\Big| \leq \Bound(t; \varepsilon) := \sum_{j=0}^{J} \Bound_j(t)\,|\varepsilon|^j 
+        \end{equation}
+    }
+    where each bound component $\Bound_j$ can be evaluated using the techinque in Section \ref{section:error-bound-for-linear-odes}. 
+    See Alg. \ref{alg:nonlinear-iterative} for details.
+
+    \begin{algorithm}
+        \caption{Iterative Method for Solution and Error Bound of Nonlinear ODE \eqref{eq:nonlinear-ode-master}} \label{alg:nonlinear-iterative}
+        \textbf{Input:} Linear operator $\L$, nonlinear degree $k$, domain $I=[0, T]$, highest order $J$ for expansion, and a sequence $\left\{(t_\ell, \varepsilon_\ell)\right\}_{\ell=1}^{L}$ where solution $u(t; \varepsilon)$ and error bound $\Bound(t; \varepsilon)$ are to be evaluated \\
+        \textbf{Output:} Solution $\left\{u(t_\ell; \varepsilon_\ell)\right\}_{\ell=1}^{L}$ and error bound $\left\{\Bound(t_\ell; \varepsilon_\ell)\right\}_{\ell=1}^{L}$ 
+        \begin{algorithmic}
+            \Require $t_\ell \in I$, and $|\varepsilon_\ell|$ to be small (ideally $|\varepsilon_\ell| \ll 1$)
+            \Ensure $\Err(t_\ell; \varepsilon_\ell) \leq \Bound(t_\ell; \varepsilon_\ell)$ 
+
+            \State $u_0, r_0, \gets$ network solution, residual of $\L u_0 = f$
+            \State $\left\{\Bound_{0}(t_\ell)\right\}_{\ell=1}^L \gets$ bound of $\left|\L^{-1}r_0\right|$ at $\left\{t_\ell\right\}_{\ell=1}^L$
+            \For{$j \gets 1 \dots J$} 
+                \State Define macro $\text{NL}_j[\phi]$ as $\sum_{\substack{j_1 + \dots + j_k = j-1\\ j_1, \dots, j_k \geq 0}} \phi_{j_1} \dots \phi_{j_k}$
+                \State $u_j, r_j \gets$ network solution, residual of $\L u_j + \text{NL}_j[u] = 0$
+                \State $\Bound_{\text{NL}} \gets \text{upper bound of }|\text{NL}_j[u] - \text{NL}_j[v]|$
+                \State $\left\{\Bound_{j}(t_\ell)\right\}_{\ell=1}^L \gets$  bound of $|\L^{-1}r_j|$+$|\L^{-1}\Bound_{\text{NL}}|$ at $\left\{t_\ell\right\}_{\ell=1}^L$
+            \EndFor
+            \State $\left\{u(t_\ell; \varepsilon_\ell)\right\}_{\ell=1}^L \gets \big\{\sum_{j=0}^{J}\varepsilon_\ell^j u_j(t_\ell)\big\}_{\ell=1}^L $ 
+            \State $\left\{\Bound(t_\ell; \varepsilon_\ell)\right\}_{\ell=1}^L \gets \big\{\sum_{j=0}^{J}\varepsilon_\ell^j \Bound_j(t_\ell)\big\}_{\ell=1}^L $ 
+            \State \textbf{return} $\left\{u(t_\ell; \varepsilon_\ell)\right\}_{\ell=1}^L, \left\{\Bound(t_\ell; \varepsilon_\ell)\right\}_{\ell=1}^L$
+        \end{algorithmic}
+        \vspace{0.5em}
+
+        \textbf{Note} 1: $\Bound_0(t)$ and $\Bound_{1:J}(t)$ can be evaluated using either Alg. \ref{alg:single-linear-ode-constant-coeff-loose} or \ref{alg:single-linear-ode-constant-coeff-tight}.\\
+        \textbf{Note} 2: $\Bound_\text{NL}$ can be estimated even though exact solutions $v_{0:j-1}(t)$ are unknown. This is because $ u_i(t) - \Bound_i(t) \leq v_i(t) \leq u_i(t)+\Bound_i(t)$ for all $i$, and $u_{0:j-1}(t)$, $\Bound_{0:j-1}(t)$ are known from previous iterations.
+    \end{algorithm}

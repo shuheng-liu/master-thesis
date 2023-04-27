@@ -1,0 +1,19 @@
+% \begin{savequote}[75mm]
+% Nulla facilisi. In vel sem. Morbi id urna in diam dignissim feugiat. Proin molestie tortor eu velit. Aliquam erat volutpat. Nullam ultrices, diam tempus vulputate egestas, eros pede varius leo.
+% \qauthor{Quoteauthor Lastname}
+% \end{savequote}
+
+\chapter{Existing Work}\label{chapter:existing-work}
+    \citeauthor{sirignano2018dgm} showed that for a class of quasi-linear parabolic PDEs, a neural network with a single hidden layer and sufficiently many hidden units could arbitrarily approximate the exact solutions \cite{sirignano2018dgm}.
+    \citeauthor{guo2022energy} proposed an energy-based \textit{constitutive relation error} bound for elasticity problems \cite{guo2022energy}.
+
+    \citeauthor{de2022errorhyperbolic} derived an error bound for ReLU networks on parametric hyperbolic conservation laws \cite{de2022errorhyperbolic}.
+    \citeauthor{de2022errorkolmogorov} also showed that there exists some PINN with arbitrarily small residual for Kolmogorov PDEs \cite{de2022errorkolmogorov}.
+    In addition, \citeauthor{de2022generic} derived an error bound for operator learning with PINNs\cite{de2022generic}.
+    The works of \citeauthor{de2022errorhyperbolic} mentioned above did not bound the error of every given network.
+    Instead, they mathematically proved the existence of a network with errors below a specified bound, under certain assumptions of network architecture, including width, depth, and activation functions. 
+    The question remaining to be answered is how to overcome optimization difficulties and find such a neural network.
+
+    Our work differs from the above in that we bound the error of \textit{any} neural network regardless of finetuning, even networks with randomly initialized weights.
+    Our algorithms only depend on inputs of residual information $r$, often used as training loss, and equations structure $\mathcal{D} v = f$.
+    The output is a (possibly constant) function that guarantees to bound the error at any point in domain.

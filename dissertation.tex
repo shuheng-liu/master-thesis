@@ -1,0 +1,94 @@
+%!TEX TS-program = xelatex 
+%!TEX encoding = UTF-8 Unicode
+
+% Modify the following line to match your school
+% Available options include `Harvard`, `Princeton`, and `NYU`.
+\documentclass[School=Harvard]{Dissertate}
+
+\usepackage[utf8]{inputenc}
+\usepackage{csquotes}
+
+
+% \usepackage[a4paper, total={7in, 9in}]{geometry}
+\usepackage{listings}
+\usepackage{soul}
+% \usepackage[sorting=none]{biblatex}
+%     \addbibresource{references.bib}
+% \usepackage{natbib} % has a nice set of citation styles and commands
+%     \bibliographystyle{plainnat}
+%     \renewcommand{\bibsection}{\subsubsection*{References}}
+
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{subfig}
+
+
+\newcommand{\vect}[1]{\mathbf{#1}}
+% \newcommand{\eq}[1]{Eq. \ref{#1}}
+\newcommand{\px}[1]{\cfrac{\partial #1}{\partial x}}
+\newcommand{\py}[1]{\cfrac{\partial #1}{\partial y}}
+\newcommand{\dx}[1]{\cfrac{\mathrm{d} #1}{\mathrm{d} x}}
+\newcommand{\dy}[1]{\cfrac{\mathrm{d} #1}{\mathrm{d} y}}
+\newcommand{\dt}[1]{\cfrac{\mathrm{d} #1}{\mathrm{d} t}}
+\newcommand{\ds}[1]{\cfrac{\mathrm{d} #1}{\mathrm{d} s}}
+\newcommand{\dnt}[2]{\cfrac{\mathrm{d}^{#1} #2}{\mathrm{d} t^{#1}}}
+% \newcommand{\Err}{\mathcal{E}}
+\newcommand{\Err}{\eta}
+\newcommand{\Bound}{\mathcal{B}}
+\newcommand{\Loss}{\mathrm{Loss}}
+\newcommand{\Net}{\mathrm{Net}}
+\renewcommand{\L}{\mathcal{L}}
+\newcommand{\I}{\mathcal{I}}
+\newcommand{\Int}[1]{e^{#1 t} \int_{0}^{t} e^{- #1 \tau}\mathrm{d}\tau}
+\newcommand{\Intt}{\int_{0}^{t}\mathrm{d}\tau}
+\renewcommand{\Re}[1]{\mathcal{R}e\left(#1\right)}
+\newcommand{\abs}{|\cdot|}
+\newcommand{\E}[1]{\mathbb{E}\left[#1\right]}
+\renewcommand{\P}[1]{\mathrm{Pr}\left(#1\right)}
+
+
+\begin{document}
+
+% the front matter
+\input{frontmatter/personalize}
+\maketitle
+\copyrightpage
+\abstractpage
+\tableofcontents
+%\authorlist
+\listoffigures
+\dedicationpage
+\acknowledgments
+
+\doublespacing
+
+% include each chapter...
+\setcounter{chapter}{-1}  % start chapter numbering at 0
+\include{chapters/introduction}
+\include{chapters/symbols-and-notations}
+\include{chapters/literature-review}
+\include{chapters/existing-work}
+\include{chapters/linear-ode-bound}
+\include{chapters/nonlinear-ode-bound}
+\include{chapters/pde-bound}
+\include{chapters/sde-bound}
+\include{chapters/experiments}
+\include{chapters/conclusion}
+\begin{appendices}
+    \include{chapters/appendix-operator-property}
+    \include{chapters/appendix-linear-ode-bounds}
+    \include{chapters/appendix-linear-system}
+\end{appendices}
+
+\singlespacing
+
+% the back matter
+\clearpage
+\bibliography{references}
+\addcontentsline{toc}{chapter}{References}
+\bibliographystyle{apalike2}
+
+\include{endmatter/colophon}
+
+\end{document}

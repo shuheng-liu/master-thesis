@@ -1,0 +1,151 @@
+% \begin{savequote}[75mm]
+% Nulla facilisi. In vel sem. Morbi id urna in diam dignissim feugiat. Proin molestie tortor eu velit. Aliquam erat volutpat. Nullam ultrices, diam tempus vulputate egestas, eros pede varius leo.
+% \qauthor{Quoteauthor Lastname}
+% \end{savequote}
+
+\chapter{Error Bound for Linear SDE}  \label{chapter:error-bound-for-linear-sdes}
+    In addition to deterministic differential equations, we also consider stochastic differential equations (SDEs) in this thesis by introducing an additional stochastic term $g(t)\xi(t)$ to the forcing function, where $g(t)$ is a deterministic part dependent on time and $\xi(t)$ is a Gaussian white noise.
+
+\section{Formulation}
+    In this chapter, we deal with linear first-order SDEs with the form
+    \begin{equation}\label{eq:linear-sde}
+    \dt{}V(t) - \lambda V(t) = f(t) + g(t) \xi(t) \quad \text{s.t.} \quad V(0) = v_0 
+    \end{equation}
+    where $\xi(t)$ is a Gaussian white noise. We assume that $f(t)$ and $g(t)$ are deterministic functions and $\lambda \in \mathbb{R}$ is a constant. 
+    We use the capital $V(\cdot)$ because it is a continuous stochastic process whose realization depends on the realization of $\xi(t)$.
+
+    While we shall work with the formulation \eqref{eq:linear-sde}, it should be noted that Eq. \eqref{eq:linear-sde} is equivalent to the following form, which is used more frequently for SDEs,
+    \begin{equation}
+    \mathrm{d}V_t = \big(\lambda V_t + f(t)\big) \mathrm{d}t + g(t) \mathrm{d} W_t
+    \end{equation}
+    where $W_t$ is a Wiener process, and $V_t$ is a continuous stochastic process to solve.
+
+    Unlike with deterministic differential equations, network solutions to SDEs are not trained on the exact SDEs, because of the intractable stochastic term. 
+    Instead, we train the network on the following deterministic differential equation
+    \begin{equation}
+    \mathbb{E}\bigg[\dt{}V(t) - \lambda V(t)\bigg] = \E{f(t) + g(t) \xi(t)}.
+    \end{equation}
+    Assuming we can change the order of expectation and differentiation, we have
+    \begin{equation}
+    \dt{}v(t) - \lambda v(t) = f(t)
+    \end{equation}
+    where $v(t) = \E{V(t)}$. 
+    Since this is a deterministic differential equation, we can solve it with a neural network $u(t)$, which incurs a residual term $r$,
+    \begin{equation}\label{eq:linear-sde-network}
+    \dt{}u(t) - \lambda u(t) = f(t) + r(t).
+    \end{equation}
+
+    We aim to formulate a bound for the absolute error $|\Eta(t)| = |u(t) - V(t)|$ using only $\lambda$, $f(\cdot)$, and $g(\cdot)$. 
+    Since the error $\Eta(t)$ (capital $\eta$, not to be confused with $H$) is a stochastic process, we shall formulate an upper tail bound for the distribution of $\Eta(t)$. 
+    Namely, we aim to formulate a bound $|\Eta| \leq \Bound_\epsilon$ that holds true with arbitrarily high probability $1 - \epsilon$,
+    \begin{equation}\label{eq:upper-tail-bound-goal}
+        \P{\, \big|\Eta(t)\big| \leq \Bound_\epsilon(t)} \geq 1 - \epsilon \quad \forall t \in I.
+    \end{equation}
+    As will be show in the following subsection, it turns out that there exists a bound $\Bound$ that is independent of the choice of $\epsilon$.
+    In other words, there is an \textit{almost sure} bound under the gaussian noise assumption.
+\section{Upper Tail Bound of Absolute Error}
+    To derive a tail bound Eq. \eqref{eq:upper-tail-bound-goal}, we take the difference between Eq. \eqref{eq:linear-sde-network} and Eq. \eqref{eq:linear-sde},
+    \begin{equation}
+        \dt{}\Eta(t)  - \lambda \Eta(t) = r(t) - g(t) \xi(t).
+    \end{equation}
+    Applying the inverse transform $\I_{\lambda}$ to both sides, we have
+    \begin{equation}
+        \Eta = \I_{\lambda} \big[ r - g \xi \big] = \I_{\lambda} r - \I_{\lambda} \big[g \xi \big].
+    \end{equation}
+    Since $\lambda \in \mathbb{R}$, by the triangle inequality and property \eqref{eq:inverse-operator-inequality} of operator $\I_{\lambda}$, there is
+    \begin{equation}\label{eq:eta-bound-unevaluated}
+        \big|\Eta\big| \leq \big|\I_{\lambda} r\big| + \big|\I_{\lambda} \big[g \xi \big]\big| \leq \I_{\Re{\lambda}} |r| + \I_{\Re{\lambda}} \big|g \xi \big| = \I_{\lambda} |r| + \I_{\lambda} \big|g \xi \big| 
+    \end{equation}
+    where the first term $\I_{\Re{\lambda}} |r|$ can be bounded using either Alg. \ref{alg:single-linear-ode-constant-coeff-loose} or Alg. \ref{alg:single-linear-ode-constant-coeff-tight}.
+    To bound the second term, we expand operator $\I$ using its definition \eqref{eq:integral-operator-definition},
+    \begin{align}
+        \I_{\lambda} \big|g \xi \big| &= e^{\lambda t}\int_0^t e^{-\lambda\tau} \big|g(\tau) \xi(\tau)\big| \mathrm{d}\tau \\
+        & = e^{\lambda t}\int_0^t e^{-\lambda\tau} \big|g(\tau)\big| \big|\xi(\tau)\big| \mathrm{d}\tau \\
+        & \leq G(t) e^{\lambda t} \int_0^t e^{-\lambda\tau} |\xi(\tau)| \mathrm{d}\tau \\
+        & \leq G(t) e^{\lambda t}  \sqrt{\left(\int_0^t e^{-2\lambda\tau} \mathrm{d}\tau\right)\left(\int_0^t\xi^2(\tau) \mathrm{d}\tau\right)} \\
+        &= G(t) \frac{\sinh(\lambda t)}{\lambda} \sqrt{\int_0^t \xi^2(\tau) \mathrm{d}\tau}, \label{eq:bound-of-ito-integral-loose}
+    \end{align}
+    where the second to last step uses the Cauchy-Schwarz inequality.
+    Here, the function $G(t) = \max\limits_{0 \leq \tau \leq t} |g(\tau)|$ is the cumulative maximum of $|g(t)|$. Eq. \eqref{eq:bound-of-ito-integral-loose} can be futher loosened by replacing $G(t)$ with its upper bound $G_{\max} = \max\limits_{\tau \in I} |g(\tau)|$,
+    \begin{equation} \label{eq:bound-of-ito-integral-tight}
+        \I_{\lambda} \big|g \xi \big| \leq G_{\max} \frac{\sinh(\lambda t)}{\lambda} \sqrt{\int_0^t \xi^2(\tau) \mathrm{d}\tau}.
+    \end{equation}
+
+    The evaluation of $\displaystyle \int_{0}^{t} \xi^2(\tau)\mathrm{d}\tau$ requires It\^o calculus, which is beyond the scope of this thesis. 
+    Instead, we informally evaluate the bound using the Riemann integral
+    \begin{equation}\label{eq:riemann-integral-chi-squared}
+        \int_0^t \xi^2(\tau) \mathrm{d}\tau = \lim_{N \to \infty} \sum_{i=1}^{N} \xi^2\left(\frac{i}{N}t\right) \frac{t}{N} = t \lim_{N \to \infty} \frac{1}{N}\sum_{i=1}^{N} X_i^2,
+    \end{equation}
+    where random variables $X_1, \dots, X_n$ independently and identically follow the standard normal distribution $\mathcal{N}(0, 1)$.
+    The sum of $N$ i.i.d. standard normal random variables follows the chi-squared distribution $\chi^2_N$ with $N$ degrees of freedom.
+    A tail bound for $\chi^2_N$ distribution is given by \citeauthor{laurent2000adaptive} \cite{laurent2000adaptive}, which states that
+    \begin{equation}
+        \P{\sum_{i=1}^{N}X_i^2 \geq N + \sqrt{2N}x + 2x^2} \leq e^{-x^2/2} \quad \forall x \geq 0. 
+    \end{equation}
+    Multiplying both sides by $\dfrac{1}{N}$ and taking the limit $N \to \infty$ inside $\P{\cdot}$, there is
+    \begin{equation}
+        \P{\lim_{N \to \infty} \frac{1}{N}\sum_{i=1}^{N}X_i^2 \geq \lim_{N\to\infty} \frac{N + \sqrt{2N}x + 2x^2}{N}} \leq e^{-x^2/2} \quad \forall x \geq 0. 
+    \end{equation}
+    Notice that $\dfrac{N + \sqrt{2N}x + 2x^2}{N} \to 1$ for any $x \geq 0$ as $N \to \infty$. Therefore, 
+    \begin{equation} \label{eq:chi-squared-tail-bound}
+        \P{\lim_{N \to \infty} \frac{1}{N}\sum_{i=1}^{N}X_i^2 \geq 1} = 0
+    \end{equation}
+    Plugging Eq. \eqref{eq:riemann-integral-chi-squared} into Eq. \eqref{eq:chi-squared-tail-bound}, we have
+    \begin{equation}
+        \P{\int_0^t \xi^2(\tau) \mathrm{d}\tau \leq t} = 1.
+    \end{equation}
+    Namely, the stochastic integral $\displaystyle \int_0^t \xi^2(\tau) \mathrm{d}\tau$ is almost surely bounded by $t$. 
+
+    Subsequently, by Eq. \eqref{eq:bound-of-ito-integral-loose} and Eq. \eqref{eq:bound-of-ito-integral-tight}, 
+    \begin{equation}
+        \I_{\lambda} |g\xi| \leq G(t) \dfrac{\sinh(\lambda t)}{\lambda} \sqrt{t} \quad\quad \text{with probability } 1.
+    \end{equation}
+    Finally, by Eq. \eqref{eq:eta-bound-unevaluated} there is
+    \begin{equation}
+        |H| \leq \I_{\lambda} |r| + G(t)\dfrac{\sinh(\lambda t)}{\lambda} \sqrt{t}  \quad\quad \text{with probability } 1.
+    \end{equation}
+    In the special case where $\lambda \leq 0$, we have the following loose bound
+    \begin{equation}
+        |H| \leq \begin{cases}
+            R_{\max}\, t + G_{\max}\, t^{3/2} & \text{if } \lambda = 0 \\
+            \dfrac{R_{\max}}{|\lambda|} + G_{\max} \dfrac{\sinh(\lambda t)}{\lambda} \sqrt{t}& \text{if } \lambda < 0 
+        \end{cases}
+        \quad \quad \text{with probability } 1.
+    \end{equation}
+
+    Similar to Alg. \ref{alg:single-linear-ode-constant-coeff-loose} and \ref{alg:single-linear-ode-constant-coeff-tight} in the previous section, we construct Alg. \ref{alg:sde-loose} and Alg. xxx to bound the error between a network solution and any realization of an true SDE solution.
+    
+    \begin{algorithm}
+        \caption{Loose Error Bound Estimation for SDE \eqref{eq:linear-sde}}\label{alg:sde-loose}
+        \textbf{Input:} Coefficient $\lambda$, residual information $r(\cdot)$, domain of interest $I = [0, T]$, time-dependent noise strength $g(\cdot)$ and a sequence of time points $\left\{t_\ell\right\}_{\ell=1}^{L}$ where error bound is to be evaluated\\
+        \textbf{Output:} Almost sure error bound at given time points $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L}$
+        \begin{algorithmic}
+            \Require $\lambda \leq 0$, and $t_\ell \in I$ for all $\ell$
+            \Ensure $\left|\Eta(t_\ell)\right| \leq \Bound(t_\ell)$ with probability $1$ for all $\ell$
+            \State \textbf{assert} $\lambda \leq 0$
+            \State $R_{\max} \gets \max_{\tau \in I} |r(\tau)|$ 
+            \State $G_{\max} \gets \max_{\tau \in I} |g(\tau)|$ 
+            \If{ $\lambda = 0$ }
+                \State $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L} \gets \left\{R_{\max}\, t_\ell + G_{\max}\, t_\ell^{3/2}\right\}_{\ell=1}^{L}$
+            \Else
+                \State $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L} \gets \left\{\dfrac{R_{\max}}{|\lambda|} + G_{\max} \dfrac{\sinh(\lambda t_\ell)}{\lambda} \sqrt{t_\ell}\right\}_{\ell=1}^{L}$
+            \EndIf
+            \State \textbf{return} $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L}$
+        \end{algorithmic}
+    \end{algorithm}
+    
+    \begin{algorithm}
+        \caption{Tight Error Bound Estimation for SDE \eqref{eq:linear-sde}}\label{alg:sde-tight}
+        \textbf{Input:} Same as Alg. \ref{alg:sde-loose}\\
+        \textbf{Output:} Same as Alg. \ref{alg:sde-loose}\\
+        \begin{algorithmic}
+            \Require Same as Alg. \ref{alg:sde-loose}, but $\lambda$ can be any real number
+            \Ensure Same as Alg. \ref{alg:sde-loose}
+            \State $\left\{\I_{\lambda} r (t_\ell)\right\}_{\ell=1}^{L} \gets$ Call Algorithm \ref{alg:single-linear-ode-constant-coeff-tight} with arguments ($\lambda$, $r(\cdot)$, $I$, $\left\{t_\ell\right\}_{\ell=1}^{L}$)
+            \State $\displaystyle \left\{G(t_\ell)\right\}_{\ell=1}^{L} \gets \Big\{\max_{0 \leq \tau \leq t_\ell} |g(\tau)|\Big\}_{\ell=1}^{L}$ 
+
+            \State $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L} \gets \Big\{\I_{\lambda} r (t_\ell) + G(t_\ell) \dfrac{\sinh(\lambda t_\ell)}{\lambda} \sqrt{t_\ell}\Big\}_{\ell=1}^{L}$ \Comment{Take limit if $\lambda=0$}
+
+            \State \textbf{return} $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L}$
+        \end{algorithmic}
+    \end{algorithm}

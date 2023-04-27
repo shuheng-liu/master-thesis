@@ -1,0 +1,137 @@
+\chapter{Proof of Propositions in Section \ref{section:system-of-linear-odes-with-constant-coefficients}}
+\label{appendix:proof-of-bounds-for-ode-systems}
+
+In this part, we prove relevant statements regarding Alg. \ref{alg:system-bound} in Section \ref{section:single-linear-ode-with-constant-coefficients} of the main paper.
+
+Consider the problem \eqref{eq:linear-system-master} in main paper. 
+The error $\pmb{\Err}$ of the network solution $\vect{u}$ satisfies the equation
+\begin{equation}\label{eq:system-err-equation}
+    \dt{} \pmb{\Err} + A\pmb{\Err} = \vect{r}(t) \quad \text{s.t.} \quad \pmb{\Err}(t=0) = \vect{0}
+\end{equation}
+where $\vect{r(t)} = \dt{}\vect{u}(t) + A\vect{u}(t) - \vect{f}(t)$ is the residual vector.
+
+With the Jordan canonical form \eqref{eq:jordan-definition}, we multiply both sides of Eq. \eqref{eq:system-err-equation} by $P^{-1}$,
+\begin{gather}
+    P^{-1}\dt{}\pmb{\Err} + P^{-1}A \pmb{\Err} = P^{-1}\vect{r}(t) \\
+    P^{-1}\dt{}\pmb{\Err} + JP^{-1} \pmb{\Err} = P^{-1}\vect{r}(t) \\
+    \dt{}\pmb{\delta} + J \pmb{\delta}  = \vect{q}(t) 
+\end{gather}
+where $\pmb{\delta}(t) := P^{-1}\pmb{\Err}(t)$ and $\vect{q}(t) = P^{-1}\vect{r}(t)$. Recall that $J$ is a Jordan canonical form consisting of $K$ Jordan blocks. Each Jordan block $J_k$ ($1\leq k \leq K$) is an $n_k \times n_k$ square matrix, with eigenvalue $\lambda_k$ on its diagonal and $1$ on its super-diagonal, where $\sum_{k=1}^{K} n_k = n$. Expanding the vector notations, there is 
+\begingroup
+    \newcommand{\?}[1]{\multicolumn{1}{c|}{#1}}
+    \begin{equation}
+        \dt{} 
+        \left(\begin{array}{c}
+            \delta_{1} \\ \vdots \\ \delta_{n_1} \\ 
+            \hline
+            \delta_{n_1 + 1} \\ \vdots \\ \delta_{n_1 + n_2} \\ 
+            \hline
+            \vdots 
+        \end{array}\right)
+        +
+        \left(\begin{array}{c|c|c}
+            \begin{matrix} && \\ &J_1& \\ && \end{matrix} & 0 & 0 \\[1.9em]
+            \hline
+            0 & \begin{matrix} && \\ &J_2& \\ && \end{matrix} & 0 \\[1.9em]
+            \hline
+            0 & 0 & \ddots 
+        \end{array}\right)
+        \left(\begin{array}{c}
+            \delta_{1} \\ \vdots \\ \delta_{n_1} \\ 
+            \hline
+            \delta_{n_1 + 1} \\ \vdots \\ \delta_{n_1 + n_2} \\ 
+            \hline
+            \vdots 
+        \end{array}\right)
+        =
+        \left(\begin{array}{c}
+            q_{1}(t)\\\vdots\\ q_{n_1}(t) \\ 
+            \hline
+            q_{n_1 + 1}(t) \\ \vdots \\ q_{n_1 + n_2}(t) \\ 
+            \hline
+            \vdots 
+        \end{array}\right)
+    \end{equation}
+\endgroup
+
+Let $N_k = n_1+\dots + n_k$. For $k$-th Jordan block indexed by $N_{k-1} < l \leq N_k$, there is
+\begin{equation}
+    \dt{}
+    \begin{pmatrix}
+        \delta_{N_{k-1} + 1} \\[0.8em] \vdots \\[0.8em] \delta_{N_k}
+    \end{pmatrix} 
+    + 
+    \begin{pmatrix}
+        \lambda_k & 1 \\
+        & \ddots & \ddots \\
+        & & \lambda_k & 1\\
+        & & & \lambda_k \\
+    \end{pmatrix}
+    \begin{pmatrix}
+        \delta_{N_{k-1} + 1} \\[0.8em] \vdots \\[0.8em] \delta_{N_k}
+    \end{pmatrix} 
+    =
+    \begin{pmatrix}
+        q_{N_{k-1} + 1}(t) \\[0.8em] \vdots \\[0.8em] q_{N_k}(t)
+    \end{pmatrix},
+\end{equation}
+which can be formulated as the following sequence of scalar equations, also known as \textit{Jordan chains}:
+\begin{alignat}{4}
+    &\dt{}\delta_{N_{k-1} + 1} &+&\lambda_k\delta_{N_{k-1} + 1} &=& q_{N_{k-1}+1} &-& \delta_{N_{k-1}+2}, \label{eq:jordan-chain-first}\\
+    &\dt{}\delta_{N_{k-1} + 2} &+&\lambda_k\delta_{N_{k-1} + 2} &=& q_{N_{k-1}+2} &-& \delta_{N_{k-1}+3}, \label{eq:jordan-chain-second}\\
+    &&&& \vdots \nonumber\\
+    &\dt{}\delta_{N_k-1} &+&\lambda_k\delta_{N_k-1} &=& q_{N_k-1} &-& \delta_{N_k}, \label{eq:jordan-chain-second2last}\\
+    &\dt{}\delta_{N_k} &+& \lambda_k\delta_{N_k} &=& q_{N_k}. \label{eq:jordan-chain-last}
+\end{alignat}
+
+The last equation (Eq. \eqref{eq:jordan-chain-last}) of the Jordan chain can be used to bound $\delta_{N_k}$ by applying the inequality \eqref{eq:operator-I-inequality}, 
+\begin{equation}\label{eq:jordan-chain-bound-last}
+    |\delta_{N_k}| = \left|\I_{-\lambda_k}q_{N_k}\right| \leq \I_{-\Re{\lambda_k}} |q_{N_k}|
+\end{equation}
+Applying the inequality \eqref{eq:operator-I-inequality} again to Eq. \eqref{eq:jordan-chain-second2last}, there is
+\begin{align}
+    |\delta_{N_k-1}| &= \left|\I_{-\lambda_k}\left(q_{N_k - 1} + \delta_{N_k}\right)\right| \\
+    &\leq \I_{-\Re{\lambda_k}} |q_{N_k - 1} - \delta_{N_k}| \\
+    &\leq \I_{-\Re{\lambda_k}} |q_{N_k - 1}| + \I_{-\Re{\lambda_k}} |\delta_{N_k}| \\
+    &\leq \I_{-\Re{\lambda_k}} |q_{N_k - 1}| + \I_{-\Re{\lambda_k}}^2 |q_{N_k}|.
+\end{align}
+The first inequality is a direct application of Eq. \eqref{eq:operator-I-inequality}. 
+The second inequality is based on linearity of the operator $\I$ and the triangle inequality. 
+The third inequality is obtained by substituting Eq. \eqref{eq:jordan-chain-bound-last}.
+Here the superscript in $\I^2$ denotes compositional square $\I^2 = \I\circ\I$.
+
+By induction, for the $k$-th Jordan block ($N_{k-1} < l \leq N_k$), there is
+\begin{equation}\label{eq:system-scalar-inequality-transformed}
+    |\delta_{l}|  \leq \sum_{j=0}^{N_k - l} \I_{-\Re{\lambda_k}} ^ {j+1} |q_{l+j}|
+\end{equation}
+We use this inequality to bound the norm of the error vector, $\left\|\pmb{\Err}\right\|$, as well as absolute value of each component, $\left|\left(\pmb{\Err}\right)_l\right|$. 
+\section{Componentwise Bound}
+    Using matrix notations, Eq. \eqref{eq:system-scalar-inequality-transformed} can be rewritten as
+    \begin{equation} \label{eq:system-component-inequality-transformed}
+        \pmb{\delta}^{\abs} \preceq \pmb{\I}\,\vect{q}^{\abs}
+    \end{equation}
+    where $\preceq$ denotes componentwise inequality, the superscript $\abs$ denotes componentwise absolute value, and $\pmb{\I}$ is defined as operator matrix $\pmb{\I} := \begin{pmatrix} \vect{I}_1 \\ & \vect{I}_2 \\ && \ddots \end{pmatrix}$ where each $\vect{I}_k = \begin{pmatrix}
+        \I_{-\Re{\lambda_k}} & \I_{-\Re{\lambda_k}}^2 & \dots &\I_{-\Re{\lambda_k}}^{n_k} \\[1ex]
+        0 & \I_{-\Re{\lambda_k}} & \dots &\I_{-\Re{\lambda_k}}^{n_k-1} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & \dots & \I_{-\Re{\lambda_k}}
+    \end{pmatrix}$ is an $n_k \times n_k$ upper-triangular block.
+    Notice that $(AB)^{\abs} \preceq A^{\abs} B^{\abs}$ for any compatible matrices $A$ and $B$. Recall $\pmb{\delta}(t) = P^{-1}\pmb{\Err}(t)$ and $\pmb{q}(t) = P^{-1} \vect{r}(t)$, there is
+    \begin{equation}
+        \pmb{\Err}^{\abs} 
+        \preceq P^{\abs}\pmb{\delta}^{\abs} 
+        \preceq P^{\abs} \pmb{\I} \left[\vect{q}^{\abs} \right]
+        \preceq P^{\abs} \pmb{\I} \left[(P^{-1})^{\abs} \vect{r}^{\abs}\right]
+        % = P^{\abs} (P^{-1})^{\abs}  \pmb{\I} \left[\vect{r}^{\abs}\right]
+    \end{equation}
+\section{Norm Bound}
+    By Eq. \eqref{eq:system-component-inequality-transformed}, we have $ \|\pmb{\delta}\| \leq \big\|\pmb{\I} [\|\vect{q}\| \vect{1}]\big\|$, where $\vect{1}$ is $n \times 1$ (constant) column vector whose components are all equal to 1.
+
+    With $\pmb{\Err} = P \pmb{\delta}$ and $\vect{q} = P^{-1}\vect{r}$, there is $\left\|\pmb{\Err}\right\| \leq \left\|P\right\| \|\pmb{\delta}\|$ and $\|\vect{q}\| \leq \left\|P^{-1}\right\| \|\vect{r}\|$, where $\|\cdot\|$ denotes the norm of a vector or the induced norm of a matrix. Consequently,
+    \begin{align}
+        \left\|\pmb{\Err}(t)\right\| &\leq \left\|P\right\| \|\pmb{\delta}(t)\| \\
+        &\leq \|P\|\, \left\|\pmb{\I}\Big[\|\vect{q}(t)\|\vect{1}\Big]\right\|\\
+        &\leq \|P\|\, \left\|\pmb{\I}\Big[\|P^{-1}\| \|\vect{r}\|\vect{1}\Big]\right\|\\
+        &\leq \|P\|\|P^{-1}\| \left\|\pmb{\I}\Big[\|\vect{r}\|\vect{1}\Big]\right\|\\
+        &=\mathrm{cond}(P)\left\|\pmb{\I}\Big[\|\vect{r}(t)\|\vect{1}\Big]\right\| 
+    \end{align}

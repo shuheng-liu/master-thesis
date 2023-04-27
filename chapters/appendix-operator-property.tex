@@ -1,0 +1,55 @@
+\chapter{Properties of Operator $\I_{\lambda} = \L_{\lambda}^{-1}$}
+\label{appendix:inverse-operator}
+
+Let $\L_{\lambda}$ ($\lambda \in \mathbb{C}$) be the differential operator $\L_{\lambda}\phi := \dt{\phi} - \lambda \phi$. Solving the differential equation $\L_{\lambda}\phi = \dt{\phi} - \lambda \phi = \psi$ under the initial condition $\phi(0) = 0$ yields the inverse operator $\I_\lambda: \psi \mapsto \phi$, where 
+\begin{equation}
+    \I_\lambda \psi (t) := e^{\lambda t}\int_{0}^{t}e^{-\lambda \tau} \psi(\tau)\mathrm{d}\tau.
+\end{equation}
+% It can be shown by simply solving the differential equation $\dt{\phi} + \phi=\psi$ under the initial condition $\phi(0) =0$.
+In addition to $\I_{\lambda} = \L^{-1}_{\lambda}$, there are a few additional properties of operator $\I_{\lambda}$
+\begin{enumerate}
+    \item \textbf{Linearity:} For all functions $\psi_1, \psi_2 : I \to \mathbb{C}$ and constants $c_1, c_2 \in \mathbb{C}$
+    \begin{equation}
+        \I_{\lambda} (c_1\psi_1 + c_2\psi_2) = c_1\,\I\psi_1 + c_2\,\I\psi_2.
+    \end{equation}
+    \item \textbf{Monotonicity:} For $\lambda\in \mathbb{R}$, there is 
+    \begin{equation}
+        \big(\forall t\in I, \psi_1(t) \leq \psi_2(t) \big) \Longrightarrow\big(\forall t \in I, \L_{\lambda}\psi_1(t) \leq \L_{\lambda}\psi_2(t)\big).
+    \end{equation}
+    \item \textbf{Commutativity:} For all $\lambda_1, \lambda_2 \in \mathbb{C}$
+    \begin{equation}
+        \I_{\lambda_1} \circ \I_{\lambda_2} = \I_{\lambda_2} \circ \I_{\lambda_1}
+    \end{equation}
+    This can be shown because $\L_{\lambda_1}\circ\L_{\lambda_2} = \L_{\lambda_2} \circ \L_{\lambda_1} = \dnt{2}{} + (\lambda_1 + \lambda_2)dt{} + \lambda_1\lambda_2$. Therefore, the inverse operators $\I_{\lambda_2} \circ \I_{\lambda_1}$ and $\I_{\lambda_1}\circ\I_{\lambda_2}$ must also be equal.
+    \item \textbf{Absolute Inequality:} For any $\lambda \in \mathbb{C}$ and scalar function $\psi: \mathbb{R}^{+} \to \mathbb{C}$, there is 
+    \begin{equation}\label{eq:operator-I-inequality}
+        |\I_\lambda \psi(t)| \leq \I_{\Re{\lambda}}|\psi(t)|.
+    \end{equation}
+    which we prove in the following section.
+\end{enumerate}
+
+\section{Proof of Inequality $|\I_\lambda \psi| \leq \I_{\Re{\lambda}}|\psi|$}
+    Let $\phi = \I_\lambda \psi$. Since $\L = \I^{-1}$, the problem is equivalent to proving $|\phi| \leq \I_{\Re{\lambda}}|\psi|$, where
+    \begin{equation}
+        \dt{}\phi-\lambda\phi = \psi.
+    \end{equation}
+    To see this, we multiply both sides with an integrating factor $e^{-\lambda t}$ and integrate from $0$ to $t$,
+    \begin{gather}
+        \int_{0}^{t} e^{-\lambda \tau} \left(\frac{\mathrm{d}}{\mathrm{d}\tau}\phi(\tau)-\lambda\phi(\tau)\right)\mathrm{d}\tau = \int_{0}^{t} e^{-\lambda \tau}\psi(\tau) \mathrm{d}\tau\\
+        % \dt{}\left(e^{-\lambda t}\phi(t)\right) &= e^{-\lambda t}\psi(t) \\
+        e^{-\lambda t}\phi(t) - \phi(0) = \int_{0}^{t} e^{-\lambda \tau}\psi(\tau) \mathrm{d}\tau
+    \end{gather}
+    Since $\phi = \I_{\lambda} \psi$, there is $\phi(0) = 0$. Hence we have
+    \begin{align}
+        % e^{-\lambda t}\phi(t) &= \int_{0}^{t} e^{-\lambda \tau}\psi(\tau) \mathrm{d}\tau \\
+        \phi(t) &= e^{\lambda t}\int_{0}^{t} e^{-\lambda \tau}\psi(\tau) \mathrm{d}\tau \\
+        |\phi(t)| &= \left|e^{\lambda t}\int_{0}^{t} e^{-\lambda \tau}\psi(\tau) \mathrm{d}\tau\right|
+    \end{align}
+    For $\lambda \in \mathbb{C}$, there is $\left|e^{\pm \lambda t}\right| = e^{\pm \Re{\lambda} t}$, where $\Re{\lambda}$ is the real part of $\lambda$.
+    Hence,
+    \begin{align}
+        |\phi(t)| &= e^{\Re{\lambda} t} \left|\int_{0}^{t} e^{-\lambda \tau}\psi(\tau) \mathrm{d}\tau \right| \\
+        &\leq e^{\Re{\lambda} t} \int_{0}^{t} \left|e^{-\lambda \tau}\psi(\tau) \right|\mathrm{d}\tau  \\
+        &=e^{\Re{\lambda} t} \int_{0}^{t} e^{-\Re{\lambda} \tau}|\psi(\tau)|\mathrm{d}\tau =: \I_{\Re{\lambda}}|\psi(t)|
+    \end{align}
+    which concludes the proof.

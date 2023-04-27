@@ -1,0 +1,63 @@
+% \begin{savequote}[75mm]
+% Nulla facilisi. In vel sem. Morbi id urna in diam dignissim feugiat. Proin molestie tortor eu velit. Aliquam erat volutpat. Nullam ultrices, diam tempus vulputate egestas, eros pede varius leo.
+% \qauthor{Quoteauthor Lastname}
+% \end{savequote}
+
+\chapter{Symbols and Notations} \label{chapter:symbols-and-notations}
+    Differential equations in this paper are posed w.r.t. unknown function $v$,
+    {
+        \small
+        \begin{equation}
+            \mathcal{D} v = f,
+        \end{equation}
+    }
+    where $\mathcal{D}$ is a possibly nonlinear differential operator and $f$ is some forcing function.
+    Unlike the exact solution $v(\cdot)$, a neural network solution $u(\cdot)$ does not strictly satisfy the equation.
+    Instead, it incurs an additional residual term, $r$, which the network aims to minimize, to the equation, 
+    {
+        \small
+        \begin{equation}
+            \mathcal{D} u = f + r.
+        \end{equation}
+    }
+    The input to $v$, $u$, $f$, and $r$ is time $t$ for ODEs and spatial coordinates $(x, y)$ for PDEs.
+    We limit our reasoning to 2-dimensional PDEs in this work.
+    In cases with multiple unknown functions, we use vector notations $\vect{v}$, $\vect{u}$, and $\vect{r}$ instead of the scalar notations $v$, $u$, and $r$.
+
+\section{Loss Function}
+    The loss function of the network solution is defined as the $L^2$ norm of residual $r$ over the domain of interest,
+    {
+        \small
+        \begin{align}
+            \Loss{}(u) := \frac{1}{|I|} \int_{I} \|r\|^2 \mathrm{d}I = \frac{1}{|I|} \int_{I} \|\mathcal{D} u - f\|^2 \mathrm{d}I,
+        \end{align}
+    }
+    where a spatial domain $\Omega$ is substituted for the temporal domain $I$ in the case of a PDE.
+
+\section{Initial and Boundary Conditions}\label{section:initial-and-boundary-conditions}
+    For a neural network to satisfy initial or boundary conditions exactly, we apply a technique called \textit{parametrization}. 
+    As an intuitive example, the parametrization $u(t) = (1 - e^{-t}) \Net(t) + v(0)$ guarantees that $u(t)$ satisfies the initial condition $u(0)=v(0)$ regardless of the network $\Net(\cdot)$.
+    This does not affect the capability of $\Net(\cdot)$ to learn any solution.
+
+    The parametrization is more complicated for higher-order ODEs and most PDEs and has been extensively studied by \citeauthor{lagaris1998artificial}\cite{lagaris1998artificial}, \citeauthor{lagaris2000neural}\cite{lagaris2000neural}, \citeauthor{mcfall2009artificial}\cite{mcfall2009artificial}, \citeauthor{lagari2020systematic}\cite{lagari2020systematic}, and \citeauthor{sukumar2021exact}\cite{sukumar2021exact}.
+    In this work, we assume all initial and boundary conditions are exactly satisfied.
+
+\section{Error and Error Bound}
+    The error of a network solution $u$ is defined as 
+    {
+        \begin{equation}
+            \Err = u - v.
+        \end{equation}
+
+    }
+    We are interested in \textit{bounding} the error with a scalar function $\Bound$ such that 
+    {
+        \begin{equation}
+            \|\Err(t)\| \leq \Bound(t) \quad \text{or} \quad \|\Err(x, y)\| \leq \Bound(x, y)
+        \end{equation}
+    }
+    where $\|\Err\| = \|u - v\|$ is the \textit{absolute error}.
+    If $\Bound$ takes on the same value $B \in \mathbb{R}^{+}$ over the domain, it can be replaced with a constant $B$.
+
+    Notice that multiple bounds $\Bound$ exist for the same network solution $u$.
+    For example, $|\Err(t)| \leq \Bound^{(1)}(t) \leq  \Bound^{(2)}(t) \leq \dots \leq B$ are bounds in decreasing order of tightness. Tighter bounds incur a higher computational cost, and looser bounds (such as constant $B$) are faster to compute.

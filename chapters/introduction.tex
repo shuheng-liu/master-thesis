@@ -1,0 +1,27 @@
+\chapter{Introduction}
+\label{chapter:introduction}
+
+Differential equations (DEs) are a useful mathematical tool for describing various phenomena in natural sciences, engineering, and humanity studies. 
+As universal approximators, neural networks are powerful in approximating unknown functions. 
+With back-propagation and modern computing devices, neural networks are convenient to differentiate, making them an ideal choice for solving differential equations.
+
+However, a major criticism of neural network solutions to DEs is the lack of error bound. 
+Traditional numerical methods, such as the finite difference method (FDM) and the finite element method (FEM), compute numerical solutions with known error bounds.
+Unlike traditional methods, the error bounds of neural network solutions are not well-studied.
+Therefore, solving DEs with neural networks requires ad hoc customization and empirical hyperparameter finetuning.
+If the error of \textit{any} given network can be bounded, we can train neural networks until the error falls below a specified tolerance threshold.
+
+Our contribution is that we propose rigorous error-bounding algorithms for any neural network solution to certain classes of equations, including linear ODEs, certain nonlinear ODEs, and first-order linear PDEs.
+These algorithms can also be extended to bound the error of other classes of equations as well.
+The proposed algorithms only use residual information and equation structure as inputs and do not rely on assumptions of finetuning.
+
+The structure of this paper is as follows.
+\begin{itemize}
+    \item Chapter \ref{chapter:symbols-and-notations} introduces the symbols and notations adopted in this paper.
+    \item Chapter \ref{chapter:literature-review} reviews the literature on emerging areas of research that are relevant to solving differential equations with neural networks.
+    \item Chapter \ref{chapter:existing-work} explains the existing effort to bounding the error of neural network solutions.
+    \item Chapters \ref{chapter:error-bound-for-linear-odes} and \ref{chapter:error-bound-for-nonlinear-ode} propose four algorithms for the error bound of linear and nonlinear ODEs.
+    \item Chapter \ref{chapter:error-bound-for-pdes} proposes two algorithms to bound the error of first-order linear PDEs under appropriate constraint.
+    \item Chapter \ref{chapter:error-bound-for-linear-sdes} proposes an algorithm to almost surely bound the error of certain linear SDEs with Gaussian noises.
+    \item Chapter \ref{chapter:experiments} uses the method of manufactured solution to verify the validity of each error-bounding algorithm and provides visualization of the tightness of the bounds.
+\end{itemize}

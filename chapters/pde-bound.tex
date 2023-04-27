@@ -1,0 +1,98 @@
+\chapter{Error Bound for First-Order Linear PDE} \label{chapter:error-bound-for-pdes}
+    This chapter considers first-order linear PDEs defined on a 2-dimensional spatial domain $\Omega$,\footnote{Similar techniques can be used for other classes of PDEs and higher dimensions where the method of characteristics applies.} 
+    % Consider the first-order linear PDE,
+    { 
+        \begin{equation}\label{eq:pde-master}
+            a(x, y) \px{v} + b(x, y) \py{v} + c(x, y)v = f(x, y)
+        \end{equation}
+    }
+    with Dirichlet boundary constraints defined on $\Gamma \subset \partial \Omega$,
+    {
+        \begin{equation}\label{eq:pde-bc-master}
+            v\big|_{(x, y) \in \Gamma} = g(x, y).
+        \end{equation}
+    }
+
+    We partition the domain into infinitely many characteristic curves $\mathcal{C}$, each passing through a point $(x_0, y_0) \in \Gamma$. The resulting curve is a parameterized integral curve 
+    {
+        \begin{equation*} 
+            \mathcal{C}: \begin{cases*}
+                x'(s) = a(x, y) \\
+                y'(s) = b(x, y) 
+            \end{cases*} 
+            \quad
+            \text{where}
+            \,\,
+            (\cdot)' = \ds{}
+            \quad
+            \text{and} 
+            \quad
+            \begin{aligned}
+                x(0) &= x_0 \\
+                y(0) &= y_0.
+            \end{aligned}
+        \end{equation*}
+    }
+    % Note that the system \eqref{eq:parameter-eq-differential} can be nonlinear but needs not always be solved for a loose error bound to be evaluated. 
+    % Still, knowing the exact characteristic curves $\mathcal{C}$ leads to a tighter bound.
+    For any $(x(s), y(s))$ on $\mathcal{C}$, functions $v, a, b, c$, and $f$ can be viewed as univariate functions of $s$. By chain rule, there is
+    {
+        
+        \begin{equation*}
+            a(x, y)\px{v} + b(x, y)\py{v} = x'(s)\px{v}  + y'(s)\py{v} = v'(s).
+        \end{equation*}
+    }
+    Hence, Eq. \eqref{eq:pde-master} is reformulated as an ODE along curve $\mathcal{C}$,
+    {
+        
+        \begin{equation}
+            v'(s) + c(s) v(s) = f(s) \quad \text{s.t. } v(0) = g(x_0, y_0),
+        \end{equation}
+    }
+    where $v(s)$, $c(s)$, and $f(s)$ are shorthand notations for $v(x(s),y(s))$, $c(x(s),y(s))$, and $f(x(s),y(s))$, respectively.
+
+    In particular, if $c(x, y) \neq 0$ for all $(x, y) \in \Omega$, both sides of Eq. \eqref{eq:pde-master} can be divided by $c(x, y)$, resulting in a residual of $r(x, y)/c(x, y)$ where $r(x, y)$ is the residual of the original problem. 
+    By Eq. \eqref{eq:linear-ode-const-loose-bound}, a constant error bound on $\mathcal{C}$ is $|\Err(s)| \leq \max_{s}\left|r(s)/c(s)\right|$. 
+    Hence, a (loose) constant error bound $B$ (see Alg. \ref{alg:linear-first-order-pde-constant}) over the entire domain $\Omega$ is
+    {
+        
+        \begin{equation}
+            |\Err(x, y)| \leq B :=\max_{(x, y)\in \Omega}\left|\frac{r(x, y)}{c(x, y)}\right|.
+        \end{equation}
+    }
+
+    \begin{algorithm}
+        
+        \caption{Constant Err Bound for Linear 1st-Order PDE}\label{alg:linear-first-order-pde-constant}
+        \textbf{Input:} Coefficient $c(x, y)$ in Eq. \eqref{eq:pde-master}, residual information $r(x, y)$ and domain of interest $\Omega$\\
+        \textbf{Output:} A constant error bound $B \in \mathbb{R}^+$
+        \begin{algorithmic}
+            \Require $c(x, y) \neq 0$ for all $(x, y) \in \Omega$
+            \Ensure $|\Err(x, y)| \leq B$ for all $(x, y) \in \Omega$
+
+            \State $\left\{(x_k, y_k)\right\}_{k} \gets$ sufficiently dense mesh grid over $\Omega$
+            \State $\displaystyle B \gets \max_{k} \left| \frac{r(x_k, y_k)}{c(x_k, y_k)}\right|$
+            \State \textbf{return} $B$
+        \end{algorithmic}
+    \end{algorithm}
+
+    Independent of the assumption $c(x, y)\neq 0$, in scenarios where the curve $\mathcal{C}$ passing through any $(x, y)$ can be computed, the error can be computed using Alg. \ref{alg:linear-first-order-pde-general}.
+
+    \begin{algorithm}
+        
+        \caption{General Err Bound for Linear 1st-Order PDE}\label{alg:linear-first-order-pde-general}
+        \textbf{Input:} Coefficients $a(x, y)$, $b(x, y)$, $c(x, y)$ in Eq. \eqref{eq:pde-master}, residual information $r(x, y)$, domain of interest $\Omega$, Dirichlet boundary $\Gamma\subset \partial \Omega$, and a sequence of points $\left\{(x_\ell, y_\ell)\right\}_{\ell=1}^{L}$ where error is to be bounded\\
+        \textbf{Output:} Error bound $\left\{\Bound(x_\ell, y_\ell)\right\}_{\ell=1}^{L}$ at given points
+        \begin{algorithmic}
+            \Require Integral curve of the vector field $\big[a(x, y)\,\, b(x, y)\big]^T$ passing through any point $(x_\ell, y_\ell) \in \Omega$ is solvable
+            \Ensure $|\Err(x_\ell, y_\ell)| \leq \Bound(x_\ell, y_\ell)$ for all $\ell$
+
+            \State $\mathcal{C}_{\text{gen}} \gets $ general solution (integral curves) to {$\begin{cases}x'(s) = a(x, y) \\ y'(s) = b(x, y)\end{cases}$}
+            \For{$\ell \gets 1 \dots L$}
+                \State $\mathcal{C}:(x(s), y(s))\gets$ instance of $\mathcal{C}_{\text{gen}}$ passing through $(x_\ell, y_\ell)$
+                \State $s^* \gets$ solution to $x(s) = x_\ell,\, y(s)=y_\ell$
+                \State $\displaystyle \Bound(x_\ell, y_\ell) \gets e^{c(s^*)}\int_{0}^{s^*}r(x(s), y(s)) e^{-c(x(s),y(s))\,s}\mathrm{d}s$ 
+            \EndFor
+            \State \textbf{return} $\left\{\Bound(x_\ell, y_\ell)\right\}_{\ell=1}^{L}$
+        \end{algorithmic}
+    \end{algorithm}

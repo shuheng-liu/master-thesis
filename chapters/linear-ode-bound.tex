@@ -1,0 +1,213 @@
+% \begin{savequote}[75mm]
+% Nulla facilisi. In vel sem. Morbi id urna in diam dignissim feugiat. Proin molestie tortor eu velit. Aliquam erat volutpat. Nullam ultrices, diam tempus vulputate egestas, eros pede varius leo.
+% \qauthor{Quoteauthor Lastname}
+% \end{savequote}
+
+\chapter{Error Bound for Linear ODE}  \label{chapter:error-bound-for-linear-odes}
+    This chapter and the next chapter consider linear and nonlinear ODEs over the temporal domain $I=[0, T]$. 
+    Initial conditions are imposed on $\cfrac{\mathrm{d}^k}{\mathrm{d}t^k}v(t=0)$ for $k = 0, \dots, (n - 1)$, where $n$ is the highest order of derivative terms in ODE.
+
+    Consider the linear ODE $\L v(t) = f(t)$, where $\L$ is a linear differential operator. 
+    Its neural network solution $u$ satisfies $\L u(t) = f(t) + r(t)$. 
+    Since error $\Err := u - v$, there is
+    {   
+        \begin{equation} \label{eq:linear-error-master}
+            \L \Err(t) = r(t).
+        \end{equation}
+    }
+    With the assumption in Section \ref{section:initial-and-boundary-conditions} that $u$ satisfies the initial conditions at $t=0$, there is
+    {
+        \begin{equation} \label{eq:linear-error-initial-condition}
+            \Err(0) = 0, \quad \dt{}{}\Err(0) = 0, \quad \dnt{2}{}\Err(0) = 0, \quad \dots 
+        \end{equation}
+    }
+    With initial conditions \eqref{eq:linear-error-initial-condition} known, a unique inverse transform $\L^{-1}$to $\L$ exists. 
+    Applying $\L^{-1}$ to Eq. \eqref{eq:linear-error-master}, there is 
+    {
+        \begin{equation}\label{eq:linear-error-inverse-master}
+            \Err(t) = \L^{-1} r(t).
+        \end{equation}
+    }
+    Hence, bounding the absolute error $\left|\Err\right|$ is equivalent to bounding $\left|\L^{-1} r\right|$. 
+    Notice that only a) the equation structure $\L$ and b) the residual information $r$ are relevant to estimating the error bound. 
+    All other factors, including parameters of the neural network $u$, forcing function $f$, and initial conditions, do not affect the error bound at all.
+
+\section{Single Linear ODE with Constant Coefficients}\label{section:single-linear-ode-with-constant-coefficients}
+    Consider the case where $\displaystyle \L = \dnt{n}{} + \sum_{j=0}^{n - 1} a_j \dnt{j}{}$ consists of only constant coefficients $a_0, a_1, \dots, \in \mathbb{R}$.
+    The characteristic polynomial of $\L$ (defined below) can be factorized into
+    {
+        \begin{equation} \label{eq:single-linear-ode-characteristic-polynomial-factorization}
+            \lambda^n + a_{n-1}\lambda^{n-1} + \dots + a_0 = \prod_{j=1}^{n}(\lambda - \lambda_j),
+        \end{equation}
+    }
+    where $\lambda_1, \dots, \lambda_n \in \mathbb{C}$ are the characteristic roots. 
+
+    It is shown in Appendix \ref{appendix:proof-of-tight-and-loose-bounds} that, for a semi-stable system ($\Re{\lambda_j} \leq 0$ for all $\lambda_j$), an error bound can be formulated as
+    \begin{equation} \label{eq:linear-ode-const-loose-bound}
+        \left|\Err(t)\right| \leq \Bound_{loose}(t) := C_{\lambda_{1:n}}\, R_{\max}\, t^{Z},
+    \end{equation}
+    where $0\leq Z \leq n$ is the number of $\lambda_j$ whose real part is $0$, $\displaystyle C_{\lambda_{1:n}} := \frac{1}{Z!}\prod_{j=1; \lambda_j\neq 0}^{n} \frac{1}{\Re{-\lambda_j}}$ is a constant coefficient, and $\displaystyle R_{\max}:=\max_{t\in I} |r(t)|$ is the maximum absolute residual over domain. 
+    Knowing bound \eqref{eq:linear-ode-const-loose-bound} is sufficient to qualitatively estimate the error for applications where only the order of error is concerned. See Alg. \ref{alg:single-linear-ode-constant-coeff-loose} for reference.
+
+    \begin{algorithm}
+        \caption{Loose Error Bound Estimation for Linear ODE with Constant Coefficients\quad (Requires Semi-Stability)}\label{alg:single-linear-ode-constant-coeff-loose}
+        \textbf{Input:} Coefficients $\left\{a_j\right\}_{j=0}^{n-1}$ for operator $\L$, residual information $r(\cdot)$, domain of interest $I = [0, T]$, and a sequence of time points $\left\{t_\ell\right\}_{\ell=1}^{L}$ where error bound is to be evaluated\\
+        \textbf{Output:} Error bound at given time points $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L}$
+        \begin{algorithmic}
+            \Require $\L$ is semi-stable, and $t_\ell \in I$ for all $\ell$
+            \Ensure $\left|\Err(t_\ell)\right| \leq \Bound(t_\ell)$ for all $\ell$
+            \State $\{\lambda_j\}_{j=1}^{n} \gets$ numerical roots of $\lambda^n+a_{n-1}\lambda^{n-1}+\dots=0$ 
+            \State \textbf{assert} $\lambda_j \leq 0$ for $1 \leq j \leq n$ 
+            \State $Z, C \gets 0, 1$
+            \For{$j\gets 1\dots n$}
+                \If{$\Re{\lambda_j} = 0$}
+                    \State $Z \gets Z + 1$
+                \Else
+                    \State $C \gets C / \Re{-\lambda_j}$
+                \EndIf
+            \EndFor
+            \State $R_{\max} \gets \max_{\tau \in I} |r(\tau)|$ \Comment{Use linspace with mini-steps}
+            \State $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L} \gets \left\{\frac{C}{Z!}R_{\max}\, t_\ell^{Z}\right\}_{\ell=1}^{L}$
+            \State \textbf{return} $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L}$
+        \end{algorithmic}
+        \vspace{0.5em} 
+        \textbf{Note}: Polynomial roots are solvable with \citeauthor{jenkins1970three} \cite{jenkins1970three}.
+    \end{algorithm}
+
+    An issue with Eq. \eqref{eq:linear-ode-const-loose-bound} and Alg. \ref{alg:single-linear-ode-constant-coeff-loose} is that they assume $\Re{\lambda_j} \leq 0$ for all characteristic roots $\lambda_j$. 
+    To address this issue, we propose an alternative error-bounding Alg. \ref{alg:single-linear-ode-constant-coeff-tight}, which requires more computation but does not require the system to be semi-stable and provides a tighter bound.
+
+    Notice that the bounds of $\Err$ in Eq. \eqref{eq:linear-error-inverse-master} can be estimated if the inverse operator $\L^{-1}$ is known. 
+    Let Eq. \eqref{eq:single-linear-ode-characteristic-polynomial-factorization} be the factorization of characteristic polynomial of $\L$.
+    Define operator $\I_{\lambda}$ as
+    \begin{equation} \label{eq:integral-operator-definition}
+        \I_\lambda \psi(t) := e^{{\lambda} t} \int_{0}^{t} e^{-{\lambda} \tau} \psi(\tau) \mathrm{d}\tau, \quad \forall \psi : I \to \mathbb{C}.
+    \end{equation}
+    It is shown in Appendix \ref{appendix:inverse-operator} that,
+    \begin{equation} \label{eq:single-linear-ode-inverse-operator-factorization}
+        \L^{-1} = \I_{\lambda_{n}} \circ \I_{\lambda_{n-1}} \circ \dots \circ \I_{\lambda_1}
+    \end{equation} 
+    and that 
+    \begin{equation} \label{eq:inverse-operator-inequality}
+        \left|\I_{\lambda} \psi\right| \ \leq \I_{\Re{\lambda}} |\psi| \quad \text{for all }\lambda \in \mathbb{C}, \text{ and } \psi : I \to \mathbb{C}.
+    \end{equation} 
+    Hence, another error bound can be formulated as
+    \begin{equation} \label{eq:single-linear-ode-inverse-operator-inequality}
+        \Bound_{tight}(t) := \left(\I_{\Re{\lambda_{n}}} \circ \dots \circ \I_{\Re{\lambda_1}}\right) |r(t)|.
+    \end{equation}
+    It is proven in Appendix \ref{appendix:proof-of-tight-and-loose-bounds} that $\Bound_{tight}$ is tighter than $\Bound_{loose}$ when $\Bound_{loose}$ is applicable,
+    \begin{equation} \label{eq:single-linear-ode-tight-and-loose}
+        \left|\Err(t)\right| \leq \Bound_{tight}(t) \leq \Bound_{loose}(t) \quad \forall t \in I.
+    \end{equation}
+    Based on Eq. \eqref{eq:single-linear-ode-inverse-operator-inequality}, we propose Alg. \ref{alg:single-linear-ode-constant-coeff-tight}, which computes $\Bound_{tight}$ by repeatedly evaluating integrals in \eqref{eq:integral-operator-definition} using the cumulative trapezoidal rule.
+
+    \begin{algorithm}
+        \caption{Tighter Error Bound Estimation for Linear ODE with Constant Coefficients\quad  (Stable and Unstable)}\label{alg:single-linear-ode-constant-coeff-tight}
+        \textbf{Input \& Output:} Same as Alg. \ref{alg:single-linear-ode-constant-coeff-loose}
+        \begin{algorithmic}
+            \Require Same as Alg. \ref{alg:single-linear-ode-constant-coeff-loose}, except $\L$ can be unstable
+            \Ensure Same as Alg. \ref{alg:single-linear-ode-constant-coeff-loose}
+            \State $\{\lambda_j\}_{j=1}^{n} \gets$ numerical roots of $\lambda^n+a_{n-1}\lambda^{n-1}+\dots=0$
+            \State $\left\{t_k\right\}_{k=0}^{K} \gets$ linspace($0$, $T$, \normalfont{sufficient steps})
+            \State $\left\{\Bound(t_k)\right\}_{k=0}^{K} \gets \left\{|r(t_k)|\right\}_{k=0}^{K}$
+            \For{$j \gets 1 \dots n$}
+                \State integral$_{k=0}^{K} \gets$ CumTrapz($\left\{e^{-\lambda_j t_{k}} \Bound(t_k)\right\}_{k=0}^{K}$, $\left\{t_k\right\}_{k=0}^{K}$) 
+                \State $\left\{\Bound(t_k)\right\}_{k=0}^{K} \gets \left\{e^{\lambda_j t_{k}}\cdot \text{integral}_k \right\}_{k=0}^{K}$ 
+            \EndFor
+            \State $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L} \gets $ Interpolate($\left\{\Bound(t_k)\right\}_{k=0}^{K}$, $\left\{t_k\right\}_{k=0}^{K}$, $\left\{t_\ell\right\}_{\ell=0}^{L}$) 
+            \State \textbf{return} $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L}$ 
+        \end{algorithmic}
+
+        \vspace{0.5em} 
+        \textbf{Note}: CumTrapz($\{y_k\}_{k=1}^K$, $\{x_k\}_{k=1}^K$) computes cumulative integral $\int_{0}^x y(x)\mathrm{d}x$ at discrete points $\{x_k\}_{k=1}^K$ using trapezoidal rule.\\
+        \textbf{Note}: Interpolate($\{y_k\}_{k=1}^K$, $\{x_k\}_{k=1}^K$, $\{x_\ell\}_{\ell=1}^L$) computes interpolant to a function with given discrete data points $\{(x_k, y_k)\}_{k=1}^K$ evaluated at $\{x_\ell\}_{\ell=1}^L$.
+    \end{algorithm}
+
+\section{Single Linear ODE of the General Form}
+   In general, the coefficients for $\L$ can be functions of $t$. Namely, $\displaystyle \L = \dnt{n}{} + \sum_{j=0}^{n-1}a_j(t)\dnt{j-1}{}$.
+   Similar to Eq. \eqref{eq:single-linear-ode-characteristic-polynomial-factorization}, $\L$ have characteristic roots $\{\lambda_{j}(t)\}_{j=1}^{n}$ as functions of $t$,
+    {
+        \begin{equation*} \label{eq:functional-factorization}
+            \lambda^n + a_{n-1}(t)\lambda^{n-1} + \dots + a_0(t) = \prod_{j=1}^{n}(\lambda - \lambda_j(t)).
+        \end{equation*}
+    }
+    We can replace constant $\lambda_j$ with functions $\lambda_j(t)$ in Eq. \eqref{eq:integral-operator-definition} and compute bound $\Bound_{tight}$ as in Eq. \eqref{eq:single-linear-ode-inverse-operator-inequality}.
+    However, the factorization in Eq. \eqref{eq:functional-factorization} is hard to implement in practice except for the first-order case  where $\L v = \frac{\mathrm{d}v}{\mathrm{d}t} + a_0(t)v$. 
+    Cases of second order and higher are out of the scope of this paper.
+
+\section{System of Linear ODEs with Constant Coefficients} \label{section:system-of-linear-odes-with-constant-coefficients}
+    Consider a system of linear ODEs with constant coefficients 
+    {
+        \begin{equation}\label{eq:linear-system-master}
+            \frac{\mathrm{d}}{\mathrm{d}t}\vect{v} + A\vect{v} = \vect{f}(t)
+        \end{equation}
+    }
+    where $\vect{v}$ and $\vect{f}$ are $\mathbb{R}^n$ vectors and $A$ is a $n\times n$ matrix. Denote the Jordan canonical form of $A$ as,
+    {
+        \begingroup 
+        \setlength\arraycolsep{1pt}
+        \begin{equation}\label{eq:jordan-definition}
+            J = P^{-1}AP= \begin{pmatrix}
+                J_1 \quad & & \\
+                & \ddots & \\
+                & & \quad J_K
+            \end{pmatrix}
+            {\quad \text{ where }\quad }
+            J_k = \begin{pmatrix}
+                \lambda_k & 1\\[-0.75em]
+                & \lambda_k & \ddots\\[-0.75em]
+                & & \ddots & 1\\[-0.25em]
+                & & & \lambda_k
+            \end{pmatrix}.
+        \end{equation}
+        \endgroup
+    }
+    Let $n_k$ be the size of Jordan block $J_k$, we construct an operator matrix $\pmb{\I} = \text{diag}(\vect{I}_1, \vect{I}_2, \dots)$, where 
+    {
+        \begingroup 
+        \setlength\arraycolsep{1pt}
+        \begin{equation}\label{eq:operator-block}
+            \vect{I}_k = \begin{pmatrix}
+                \I_{-\Re{\lambda_k}} & \I_{-\Re{\lambda_k}}^2 & \dots &\I_{-\Re{\lambda_k}}^{n_k} \\[1ex]
+                0 & \I_{-\Re{\lambda_k}} & \dots &\I_{-\Re{\lambda_k}}^{n_k-1} \\[-1ex]
+                \vdots & \vdots & \ddots & \vdots \\
+                0 & 0 & \dots & \I_{-\Re{\lambda_k}}
+            \end{pmatrix}.
+        \end{equation}
+        \endgroup
+    }
+    An \textit{elementwise bound} (vector) $\pmb{\Bound}(t)$ can be formulated as 
+    {
+        \begin{equation}\label{eq:system-component-bound}
+            \pmb{\Err}^{\abs}(t) \preceq \pmb{\Bound}(t) := P^{\abs} \pmb{\I}\left[(P^{-1})^{\abs} \ \vect{r}^{\abs}\right](t),
+        \end{equation}
+    }
+    where superscript $\abs$ denotes taking elementwise absolute value and symbol $\preceq$ denotes elementwise inequality. In the meantime, a \textit{norm bound} (scalar) $\Bound(t)$ also exists
+    {
+        \begin{equation}\label{eq:system-norm-bound}
+            \left\|\pmb{\Err}(t)\right\| \leq \Bound(t) := \mathrm{cond}(P)\left\|\pmb{\I}\big[\|\vect{r}\|\vect{1}\big](t)\right\|
+        \end{equation}
+    }
+    where $\mathrm{cond}(P)$ is the conditional number of $P$ w.r.t. induced matrix norm, and $\vect{1}$ is an $n\times 1$ column vector of $1$s. 
+    Proof of Eq. \eqref{eq:system-component-bound} and Eq. \eqref{eq:system-norm-bound} can be found in Appendix \ref{appendix:proof-of-bounds-for-ode-systems}.
+    See Alg. \ref{alg:system-bound} for implementation.
+
+    \begin{algorithm}
+        \caption{ODE System Bound (norm and elementwise)}\label{alg:system-bound}
+        \textbf{Input:} Coefficient matrix $A \in \mathbb{R}^{n\times n}$, residual vector $\vect{r}(t)$, and a sequence of points $\left\{t_\ell\right\}_{\ell=1}^{L}$ where error is to be bounded\\
+        \textbf{Output:} Norm bound (scalar) $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L}$ and componentwise bound (vector) $\left\{\pmb{\Bound}(t_\ell)\right\}_{\ell=1}^{L}$ at given time points
+        \begin{algorithmic}
+            \Ensure $\|\Err(t_\ell)\| \leq \Bound(t_\ell)$ and $\Err(t_\ell) \preceq \pmb{\Bound}(t_\ell)$ for all $\ell$
+
+            \State $J, P \gets $ Jordan canonicalization of $A = PJP^{-1}$
+            % \State $\vect{I} \gets$ construct matrix operator $\vect{I}$ using Eq. \eqref{eq:operator-block}
+            \For{each Jordan block $J_k$ of shape $n_k \times n_k$}
+                \State $\vect{I}_k \gets$ construct operator block using Eq. \eqref{eq:operator-block} 
+            \EndFor
+            \State $\pmb{\I} \gets$ diag($\vect{I}_1$, $\vect{I}_2$,  \dots)
+            \State $\left\{\pmb{\Bound}(t_\ell)\right\}_{\ell=1}^{L} \gets \{P^{\abs} \pmb{\I}\big[(P^{-1})^{\abs} \vect{r}^{\abs}\big](t_\ell)\}_{\ell=1}^{L}$
+            \State $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L} \gets \{\mathrm{cond}(P)\left\|\pmb{\I}\big[\|\vect{r}\|\vect{1}\big](t_\ell)\right\|\}_{\ell=1}^{L}$
+            \State \textbf{return} $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L}$, $\left\{\pmb{\Bound}(t_\ell)\right\}_{\ell=1}^{L}$
+        \end{algorithmic}
+    \end{algorithm}
+

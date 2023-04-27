@@ -1,0 +1,52 @@
+\chapter{Proof of Tight and Loose Bounds}
+\label{appendix:proof-of-tight-and-loose-bounds}
+
+This part proves the following two inequalities mentioned in Eq. \eqref{eq:single-linear-ode-tight-and-loose}, 
+\begin{equation}\label{eq:tight-bound-to-prove}
+    |\Err(t)| \leq \Bound_{tight}(t) :=\left(\I_{\Re{\lambda_1}}\circ\dots\circ\I_{\Re{\lambda_n}}\right)r(t)
+\end{equation}
+and, if $\Re{\lambda_j} \leq 0$ for all $\lambda_j$, 
+\begin{equation}\label{eq:loose-bound-to-prove}
+    \Bound_{tight}(t) \leq \Bound_{loose}(t) := \cfrac{1}{Z!} \prod_{\substack{j=1\\ \Re{\lambda_j} \neq 0}}^n \frac{1}{\Re{-\lambda_j}} \max_{\tau\in I}\left|r(\tau)\right|\, t^{Z},
+\end{equation}
+where $Z$ is the number $\lambda_j$ whose real part is $0$.
+
+\paragraph{Proof} For any linear differential operator $\L=\dnt{n}{} + a_{n-1}\dnt{n-1}{}+\dots+a_0$ whose coefficients $\{a_j\}_{j=0}^{n-1}$ satisfy 
+\begin{equation}
+    \lambda^n + a_{n-1}\lambda^{n-1} + \dots +a_0 = \prod_{j=1}^{n} \left(\lambda - \lambda_j\right),
+\end{equation}
+it can be verified that $\L = \L_{\lambda_1} \circ\dots \circ \L_{\lambda_n}$, where $\L_{\lambda_j}\phi := \dt{\phi}-\lambda_j\phi$ as defined in appendix \ref{appendix:inverse-operator}. Then by the proposition in appendix \ref{appendix:inverse-operator}, the inverse operator is given by
+\begin{equation}
+    \L^{-1} = \left(\L_{\lambda_1} \circ\dots \circ \L_{\lambda_n}\right)^{-1} = \L_{\lambda_n}^{-1} \circ\dots \circ \L_{\lambda_1}^{-1} = \I_{\lambda_n} \circ\cdots\circ\I_{\lambda_1}
+\end{equation}
+Through repeated application of Inequality \eqref{eq:operator-I-inequality}, we can prove Eq. \eqref{eq:tight-bound-to-prove}
+\begin{align}
+    \left|\Err(t)\right| &= \left| \L^{-1} r(t) \right| \\
+    &=\left|\left(\I_{\lambda_n} \circ\cdots\circ\I_{\lambda_1}\right) r(t)\right| \\
+    &=\left|\I_{\lambda_n}\left(\I_{\lambda_{n-1}} \circ\cdots\circ\I_{\lambda_1}\right) r(t)\right| \\
+    &\leq \I_{\Re{\lambda_n}}\left|\left(\I_{\lambda_{n-1}} \circ\cdots\circ\I_{\lambda_1}\right) r(t)\right| \\
+    &\leq \left(\I_{\Re{\lambda_n}}\circ \I_{\Re{\lambda_{n-1}}}\right)\left|\left(\I_{\lambda_{n-2}} \circ\cdots\circ\I_{\lambda_1}\right) r(t)\right| \\
+    &\leq \dots \nonumber \\
+    &\leq \left(\I_{\Re{\lambda_n}}\circ \cdots \circ\I_{\Re{\lambda_{1}}}\right)\left|r(t)\right| =: \Bound_{tight}(t).
+\end{align}
+
+In order to prove Eq. \eqref{eq:loose-bound-to-prove}, consider the cases of $\Re{\lambda} < 0$ and $\Re{\lambda} = 0$ separately.
+\begin{itemize}
+    \item If $\Re{\lambda} < 0$, for any constant $c\in \mathbb{R^{+}}$, there is \begin{equation} \I_{\Re{\lambda}} [c] = e^{\Re{\lambda t}} \int_{0}^{t} c e^{-\Re{\lambda}\tau} \mathrm{d}\tau = \frac{c}{-\Re{\lambda}} \left(1 - e^{\Re{\lambda} t}\right) \leq \cfrac{c}{-\Re{\lambda}}\quad \text{for} \quad t\geq0\end{equation}
+    \item If $\Re{\lambda} = 0$, for any monomial $c t^{m}$, there is \begin{equation} \I_{\Re{\lambda }}[ct^m] = \I_{0}[ct^m] \int_{0}^{t} c\mathrm{\tau} ^m \mathrm{d}\tau = \frac{c}{m+1}t^{m+1} \quad\text{for}\quad t > 0 \end{equation}
+\end{itemize}
+
+Let $\displaystyle R_{\max} := \max_{\tau\in I} |r(t)|$ be the max absolute residual.
+Let $Z = |\left\{\lambda_j\ :\Re{\lambda_j} =0,1 \leq j \leq n\right\}|$. 
+Assume without loss of generality that $\Re{\lambda_1}, \dots, \Re{\lambda_{n-Z}} < 0$ and that $\Re{\lambda_{n-Z+1}} = \dots = \Re{\lambda_n} = 0$.
+By the monotonicity of operator $\I_{\Re{\lambda}}$, there is $\I_{\Re{\lambda}} \phi_1(t) \leq \I_{\Re{\lambda}} \phi_2(t)$ if $\phi_1(t) \leq \phi_2(t)$ for all $t \in I$. Hence, 
+\begin{align}
+    \Bound_{tight}(t) &= \left(\I_{\Re{\lambda_n}}\circ \cdots \circ\I_{\Re{\lambda_{1}}}\right)\left|r(t)\right| \\
+    &\leq \left(\I_{\Re{\lambda_n}}\circ \cdots \circ\I_{\Re{\lambda_{1}}}\right) R_{\max}\\
+    &\leq \left(\I_{\Re{\lambda_n}}\circ \cdots \circ\I_{\Re{\lambda_{2}}}\right) \frac{1}{-\Re{\lambda_1}}R_{\max}\\
+    &\leq \dots \nonumber \\
+    &\leq \left(\I_{\Re{\lambda_n}}\circ \cdots \circ\I_{\Re{\lambda_{n-Z+1}}}\right) \prod_{j=1}^{n-Z}\frac{1}{-\Re{\lambda_j}}R_{\max}\\
+    &= \I_0^Z \left[\prod_{\substack{j=1\\ \Re{\lambda_j}\neq 0}}^{n}\frac{1}{-\Re{\lambda_j}}R_{\max}\right]\\
+    &= \frac{1}{Z!} \prod_{\substack{j=1\\ \Re{\lambda_j}\neq 0}}^{n}\frac{1}{-\Re{\lambda_j}}R_{\max}\, t^Z =: \Bound_{loose}(t)
+\end{align}
+which proves Eq. \eqref{eq:loose-bound-to-prove}.

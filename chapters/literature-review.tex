@@ -1,0 +1,26 @@
+% \begin{savequote}[75mm]
+% This is some random quote to start off the chapter.
+% \qauthor{Firstname lastname}
+% \end{savequote}
+
+\chapter{Literature Review} \label{chapter:literature-review}
+    \citeauthor{hornik1989multilayer} showed that neural networks are universal function approximators \cite{hornik1989multilayer}. 
+    \citeauthor{lagaris1998artificial} first studied the application of neural networks in solving DEs \cite{lagaris1998artificial}.
+    The term \textit{physics-informed neural networks}, or PINNs, was first introduced by \citeauthor{raissi2019physics} to name neural networks that satisfy DEs while fitting observed data points \cite{raissi2019physics}. 
+    Although we train PINNs only to solve DEs without any observed data in this work, the error-bounding algorithms we propose work for any given neural network, regardless of the training process.
+
+    \citeauthor{flamant2020solving} and \citeauthor{DesaiShaan2021OTLo} showed that one main advantage of neural networks over traditional numerical methods, such as FDM and FEM, is that neural networks can potentially learn the structure of the solution space and give a bundle of solutions $u(\vect{x}; \Theta)$ for different equation setup and initial/boundary conditions parameterized by $\Theta$.
+    For traditional methods, a new solution must be recomputed for any slight changes in equation setup or initial/boundary conditions.
+
+    Some effort has been made to redefine the objective loss function. 
+    \citeauthor{yu2017deep} applied the Ritz method to a particular class of variational problems \cite{yu2017deep}.
+    \citeauthor{mattheakis2020hamiltonian} incorporated an additional constraint to force the network to learn solutions with energy conservation \cite{mattheakis2020hamiltonian}.
+    \citeauthor{parwani2021adversarial} used an adversarial network for sampling in particular areas of the domain where the residual is large \cite{parwani2021adversarial}.
+
+    There are also works that study the failure modes of PINNs and quantify the error of PINN solutions in recent years. 
+    \citeauthor{graf2021uncertainty} worked on quantifying the uncertainty of PINNs using the Bayesian framework \cite{graf2021uncertainty}.
+    \citeauthor{krishnapriyan2021characterizing} characterized possible failure modes of PINNs by studying the performance of PINNs on simple problems and analyzing their loss landscape. 
+    \citeauthor{krishnapriyan2021characterizing} also concluded that optimization difficulty is the essential cause of failure \cite{krishnapriyan2021characterizing}.
+
+    Our work uncovers the mathematical relationship between residual information and the error of PINNs on several classes of ODEs and PDEs. 
+    We propose different algorithms for various classes of equations and experimentally validate these algorithms.
