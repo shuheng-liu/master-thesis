@@ -1,14 +1,14 @@
 \chapter{Relevant Experiments}\label{chapter:experiments}
-    In this section, we perform experiments on equations with manufactured solutions using the \textit{NeuroDiffEq} library \citep{chen2020neurodiffeq}, which provides convenient tools for training PINNs. 
+    In this chapter, we perform experiments on equations with manufactured solutions using the \textit{NeuroDiffEq} library \citep{chen2020neurodiffeq}, which provides convenient tools for training PINNs. 
 
     First, we train networks to solve equations and collect their residual information $r$.
-    Then, we apply Alg. \ref{alg:single-linear-ode-constant-coeff-loose}--\ref{alg:linear-first-order-pde-general} (where applicable) to derive error bounds using only residual information $r$ and equation structure, characterized by its differential operator $\mathcal {D}$. 
+    Then, we apply Alg. \ref{alg:single-linear-ode-constant-coeff-loose}--\ref{alg:sde} (where applicable) to derive error bounds using only residual information $r$ and equation structure, characterized by its differential operator $\mathcal {D}$. 
     Lastly, we show that the absolute error strictly falls within the bounds, regardless of how well the networks are trained.
 
-    Throughout this section, we always use networks with two hidden layers, each consisting of 32 hidden units.
+    Throughout this chapter, we always use networks with two hidden layers, each consisting of 32 hidden units.
     Depending on whether the problem is an ODE or PDE, a network can have a single input $t$ or two inputs $(x, y)$, but always have a single output.
     The activation function is $\tanh$. 
-    Unless otherwise noted, the training domain is $I=[0, 1]$ for ODEs and $\Omega=[0,1]^2$ for PDEs. 
+    Unless otherwise noted, the training domain is $I=[0, 1]$ for ODEs and $\Omega=[-1,1]^2$ for PDEs. 
     We use a \textit{PyTorch} Adam optimizer with default hyperparameters to train networks for 1000 epochs.
 
     Notice that we list these configurations only for the reproducibility of visualizations. 
@@ -32,7 +32,7 @@
     \end{figure}
 
 \section{Linear ODE System with Constant Coefficients} \label{section:high-dimension}
-    In this subsection, we train $6$ networks to solve a $6$-dimensional linear system of ODEs with constant coefficients, namely, $\frac{\mathrm{d}}{\mathrm{d}t}\vect{v} + A\vect{v} = \vect{f}$. 
+    In this section, we train $6$ networks to solve a $6$-dimensional linear system of ODEs with constant coefficients, namely, $\frac{\mathrm{d}}{\mathrm{d}t}\vect{v} + A\vect{v} = \vect{f}$. 
     We pick $A = PJP^{-1}$ where {$J=\begin{pmatrix}J_1\\[-1.25ex]&J_2\\[-1.25ex]&&J_3\end{pmatrix}$} with {$J_1 = \begin{pmatrix} 4&1\\[-1.25ex]&4&1\\[-1.25ex]&&4\\[-0.5ex]\end{pmatrix}$, $J_2 = \begin{pmatrix} 3&1\\[-1.25ex]&3\\[-0.25ex]\end{pmatrix}$ }, $J_3=2$, and $P$ is a random orthogonal matrix.
 
     We pick the initial conditions to be {$\vect{v}(0) = P(0\, 0\, 1\, 0\, 1\, 1)^{T}$} and the forcing function to be {$\vect{f}(t) = P(\cos t + 4 \sin t  + \ln(1+t),\, \frac{1}{1+t} + 4 \ln(1+t) + (t+1),\, 4t + 5,\, 2t + 3t^2 + e^t,\, 4 e^t,\, 2 \cos t - \sin t )^T$}, so that the manufactured exact solution is {$\vect{v}(t) = P ( \sin t,\, \ln(t + 1),\, t + 1,\, t^2,\, e^t,\, \cos t)^T$}.
@@ -47,7 +47,7 @@
     \end{figure}
 
 \section{Nonlinear ODE -- Duffing Equation} \label{section:experiment-duffing}
-    In this subsection, we consider a Duffing oscillator, which is characterized by the following $2$nd order nonlinear ODE:
+    In this section, we consider a Duffing oscillator, which is characterized by the following $2$nd order nonlinear ODE:
     {
         \begin{equation}\label{eq:duffing}
             \frac{\mathrm{d}^2 v}{\mathrm{d}t^2} + 3 \frac{\mathrm{d}v}{\mathrm{d}t} + 2v +\varepsilon v^3 = \cos t ,
@@ -135,4 +135,23 @@
         \caption{
             Constant bound $B$, computed using Alg. \ref{alg:linear-first-order-pde-constant}, and max absolute error over domain at different epochs of training.
         }\label{fig:pde-constant-bound}
+    \end{figure}
+
+\section{Linear SDE}
+    In this section, we verify the validity of error-bounding algorithm \ref{alg:sde} on the following stochastic differential equation:
+    \begin{equation}\label{eq:sde-experiment}
+        \d V_t = \big(e^{-t} -(2t + \sin t) V_t \big)\d t + \ln(t+5) \d W_t
+    \end{equation}
+    We compute 10 true error paths by taking the difference between the network solution $u(t)$ and 10 different realizations $V_t$, which are computed using stochastic Runge-Kutta method proposed by \citeauthor{rossler2010runge} \cite{rossler2010runge} for strong apprxoimation of SDEs.
+
+    We verify that the error bound $|\Eta_t| \leq \Bound_{\epsilon}(t) = \Bound'_{\frac{\epsilon}{2}, \frac{\epsilon}{2}}(t)$, where $\Bound'_{\epsilon_1, \epsilon_2}$ is defined by Eq. \eqref{eq:bound-two-epsilon}, holds with at least desired probability $(1-\epsilon)$ for $\epsilon \in \left\{ 0.1, 0.2, \dots, 0.6\right\}$.
+    As shown in Fig. \ref{fig:sde-bound-1}.
+
+    \begin{figure}[!ht]
+        \centering
+        \includegraphics[width=\linewidth]{assets/sde1.pdf}
+        \caption{
+            Error and error bound for stochastic differential equation \eqref{eq:sde-experiment}. 
+            Solid lines are error bounds $\Bound_{\epsilon}$ that hold with probability at least $1-\epsilon$ for $\epsilon = 0.1,\, 0.2,\, \dots,\, 0.6$ and dotted lines are error paths from 10 different realizations. 
+        }\label{fig:sde-bound-1}
     \end{figure}
