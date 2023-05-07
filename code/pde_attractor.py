@@ -31,7 +31,7 @@ def plot_characteristics():
     _theta = np.linspace(0, 2 * np.pi, 40).reshape(-1, 1)
     start_points = np.hstack([np.cos(_theta), np.sin(_theta)])
 
-    fig, ax = plt.subplots(1, 1, figsize=(3, 3), dpi=70)
+    fig, ax = plt.subplots(1, 1, figsize=(3, 3), dpi=100)
 
     ax.streamplot(
         x, y, u, v,
@@ -45,17 +45,17 @@ def plot_characteristics():
     ax.set_ylim(-1.02, 1.02)
     ax.set_xticks([-1, -0.5, 0, 0.5, 1], label=['-1', '-0.5', '0', '0.5', '1'])
     ax.set_yticks([-1, -0.5, 0, 0.5, 1], label=['-1', '-0.5', '0', '0.5', '1'])
-    ax.tick_params(axis='both', which='major', labelsize=16)
+    ax.tick_params(axis='both', which='major', labelsize=12)
 
     for i, (x0, y0) in enumerate(zip(X0s, Y0s)):
         x, y, _ = get_curve(x0, y0)
         ax.plot(x, y, color='red', linestyle='--')
-        ax.text(x0 + 0.05, y0 + 0.05, f'${POINT_NAMES[i]}$', fontdict=dict(fontsize=14))
+        ax.text(x0 + 0.05, y0 + 0.05, f'${POINT_NAMES[i]}$', fontdict=dict(fontsize=12))
 
-    ax.plot(X0s, Y0s, 'o', color='black')
+    ax.scatter(X0s, Y0s, 20, color='black')
 
-    ax.set_xlabel('$x$', fontdict=dict(fontsize=16))
-    ax.set_ylabel('$y$', fontdict=dict(fontsize=16), rotation=0)
+    ax.set_xlabel('$x$', fontdict=dict(fontsize=12))
+    ax.set_ylabel('$y$', fontdict=dict(fontsize=12), rotation=0)
     fig.savefig(visualization_helper.get_folder() / 'characteristics.pdf', bbox_inches='tight')
 
 
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     u = partial(solver.get_solution(best=False), to_numpy=True)
     v = lambda x, y: 2 * x + 3 * y
 
-    fig, axes = plt.subplots(6, 3, figsize=(6, 8), dpi=70)
+    fig, axes = plt.subplots(4, 4, figsize=(6, 4.5), dpi=100)
     axes = axes.flatten()
     for x0, y0, ax, point_name in zip(X0s, Y0s, axes, POINT_NAMES):
         x_s, y_s, s = get_curve(x0, y0)
@@ -112,14 +112,14 @@ if __name__ == "__main__":
 
         ax.plot(s, abs(err_s), label=r'Abs. Err')
         ax.plot(s, bound_s, 'r:', label=r'Bound')
-        ax.text(0.25, 0.75, f'Starting at ${point_name}$', fontdict=dict(fontsize=12), transform=ax.transAxes)
+        ax.text(0.33, 0.55, f'Starting \n at point ${point_name}$', fontdict=dict(fontsize=10), transform=ax.transAxes)
         ax.set_xticks([0, 5, 10], ['0', '$s$', '10'])
-        ax.tick_params(axis='both', which='major', labelsize=14)
+        ax.tick_params(axis='both', which='major', labelsize=12)
         ax.tick_params(axis='x', which='major', pad=0)
         ax.tick_params(axis='y', which='major', pad=2)
 
-    axes[-3].legend(loc=(1.05, 0.25), prop=dict(size=16))
-    axes[-2].remove()
-    axes[-1].remove()
+
     plt.subplots_adjust(wspace=0.15, hspace=0.4, left=0.05, bottom=0.05, right=0.99, top=.95)
     fig.savefig(visualization_helper.get_folder() / 'pde-error-bound.pdf', bbox_inches=0)
+
+    plt.show()

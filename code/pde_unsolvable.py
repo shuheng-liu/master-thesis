@@ -12,6 +12,11 @@ from neurodiffeq.callbacks import ActionCallback
 
 import visualization_helper
 
+_x = np.linspace(-1, 1, 100)
+_y = np.linspace(-1, 1, 100)
+DOMAIN = np.meshgrid(_x, _y)
+
+
 def plot_characteristics():
     x = np.linspace(-1, 1, 1000)
     y = np.linspace(-1, 1, 1000)
@@ -19,7 +24,7 @@ def plot_characteristics():
     u = x**2 + y ** 2 + 1
     v = x**2 - y ** 2 - 2
 
-    fig, ax = plt.subplots(1, 1, figsize=(3, 3), dpi=70)
+    fig, ax = plt.subplots(1, 1, figsize=(3, 3), dpi=100)
 
     ax.streamplot(
         x, y, u, v,
@@ -33,10 +38,10 @@ def plot_characteristics():
     ax.set_ylim(-1.02, 1.02)
     ax.set_xticks([-1, -0.5, 0, 0.5, 1], label=['-1', '-0.5', '0', '0.5', '1'])
     ax.set_yticks([-1, -0.5, 0, 0.5, 1], label=['-1', '-0.5', '0', '0.5', '1'])
-    ax.tick_params(axis='both', which='major', labelsize=16)
+    ax.tick_params(axis='both', which='major', labelsize=12)
 
-    ax.set_xlabel('$x$', fontdict=dict(fontsize=16))
-    ax.set_ylabel('$y$', fontdict=dict(fontsize=16), rotation=0)
+    ax.set_xlabel('$x$', fontdict=dict(fontsize=12))
+    ax.set_ylabel('$y$', fontdict=dict(fontsize=12), rotation=0)
 
     fig.savefig(visualization_helper.get_folder() / 'unsolvable-characteristics.pdf', bbox_inches='tight')
 
@@ -109,13 +114,14 @@ if __name__ == "__main__":
         with open('pde-max-abs-err.pkl', 'wb') as f:
             pkl.dump(max_abs_err, f)
     
-    fig, ax = plt.subplots(1, 1, figsize=(6, 1.5), dpi=70)
+    fig, ax = plt.subplots(1, 1, figsize=(6, 1.5), dpi=100)
     epochs = 1 + np.arange(len(max_residual_over_c))
     ax.plot(epochs, max_residual_over_c, 'r:', label=r'$\mathcal B(x, y) \equiv B$')
     ax.plot(epochs, max_abs_err, color='blue', label=r'$\displaystyle \max_{(x, y)\in\Omega}|\eta(x, y)|$')
-    ax.set_xlabel('Number of Training Epochs', fontdict=dict(fontsize=14))
+    ax.set_xlabel('Number of Training Epochs', fontdict=dict(fontsize=12))
     ax.set_yscale('log')
-    ax.legend(prop=dict(size=14))
-    ax.tick_params(axis='both', which='major', labelsize=16)
+    ax.legend(prop=dict(size=12))
+    ax.tick_params(axis='both', which='major', labelsize=12)
 
     fig.savefig(visualization_helper.get_folder() / 'pde-constant-bound.pdf', bbox_inches='tight')
+    plt.show()

@@ -98,33 +98,36 @@ if __name__ == "__main__":
 
     res = solver.get_residuals(DOMAIN, best=False, to_numpy=True)
     bound_deterministic = get_deterministic_bound(solver, DOMAIN)
-    fig, ax = plt.subplots(1, 1, figsize=(8, 3.5), dpi=125)
+    fig, ax = plt.subplots(1, 1, figsize=(6, 2.5), dpi=125)
     for eps in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]:
-        bound_stochastic = get_stochastic_bound(DOMAIN, eps/2, eps/2)
+        bound_stochastic = get_stochastic_bound(DOMAIN, eps / 2, eps / 2)
         bound = bound_deterministic + bound_stochastic
-        ax.plot(DOMAIN, bound, label=r'$\mathcal{B}_\epsilon(t)$ with $\epsilon = $' + f'{eps:.1f}')
+        ax.plot(DOMAIN, bound, label=r'$\mathcal{B}_{\epsilon=' + f'{eps:.1f}' + '}$')
     for err in err_realizations:
-        # success_rate = (abs(err) <= bound).mean()
         ax.plot(DOMAIN, abs(err), ':', color='blue', markersize=0.5)
-    ax.legend(ncol=2, prop=dict(size=12))
-    ax.set_xlabel(r'$t$', fontdict={'size': 16})
-    ax.set_ylabel(r'$|u(t) - V_t|$', fontdict={'size': 16})
-    plt.show()
+    ax.legend(ncol=3, prop=dict(size=10), columnspacing=1.0)
+    ax.set_xlabel(r'$t$', fontdict={'size': 12})
+    ax.set_ylabel(r'$|u(t) - V_t|$', fontdict={'size': 12})
+    ax.set_xlim(-0.005, 0.205)
 
     fig.savefig(visualization_helper.get_folder() / 'sde1.pdf', bbox_inches='tight')
 
-    fig, ax = plt.subplots(1, 1, figsize=(8, 3.6), dpi=125)
+    fig, ax = plt.subplots(1, 1, figsize=(6, 2.5), dpi=125)
     eps = 0.2
-    for rho in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-        bound_stochastic = get_stochastic_bound(DOMAIN, eps * rho, eps * (1-rho))
+    for rho in [0.1, 0.3, 0.5, 0.7, 0.9]:
+        bound_stochastic = get_stochastic_bound(DOMAIN, eps * rho, eps * (1 - rho))
         bound = bound_deterministic + bound_stochastic
-        ax.plot(DOMAIN, bound, label=r'$\mathcal{B}$ with $\rho$=' + f'{rho}')
+        eps1 = eps * rho
+        eps2 = eps * (1 - rho)
+        ax.plot(DOMAIN, bound, label=r"$\mathcal{B}'_{\epsilon_1 = EPS_1, \epsilon_2 = EPS_2}$"
+                .replace('EPS_1', f'{eps1:.2f}').replace('EPS_2', f'{eps2:.2f}'))
     for err in err_realizations:
-        # success_rate = (abs(err) <= bound).mean()
         ax.plot(DOMAIN, abs(err), ':', color='blue')
-    ax.legend(ncol=2, prop=dict(size=12))
-    ax.set_xlabel(r'$t$', fontdict={'size': 16})
-    ax.set_ylabel(r'$|u(t) - V_t|$', fontdict={'size': 16})
-    plt.show()
+    ax.legend(ncol=2, prop=dict(size=10), columnspacing=1.0)
+    ax.set_xlabel(r'$t$', fontdict={'size': 12})
+    ax.set_ylabel(r'$|u(t) - V_t|$', fontdict={'size': 12})
+    ax.set_xlim(-0.005, 0.205)
 
     fig.savefig(visualization_helper.get_folder() / 'sde2.pdf', bbox_inches='tight')
+
+    plt.show()

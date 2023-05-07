@@ -61,8 +61,9 @@
         \end{equation}
     }
 
+    \makeatletter
+    \setlength{\@fptop}{0pt}
     \begin{algorithm}
-        
         \caption{Constant Err Bound for Linear 1st-Order PDE}\label{alg:linear-first-order-pde-constant}
         \textbf{Input:} Coefficient $c(x, y)$ in Eq. \eqref{eq:pde-master}, residual information $r(x, y)$ and domain of interest $\Omega$\\
         \textbf{Output:} A constant error bound $B \in \mathbb{R}^+$
@@ -75,11 +76,13 @@
             \State \textbf{return} $B$
         \end{algorithmic}
     \end{algorithm}
+    \makeatother
 
     Independent of the assumption $c(x, y)\neq 0$, in scenarios where the curve $\mathcal{C}$ passing through any $(x, y)$ can be computed, the error can be computed using Alg. \ref{alg:linear-first-order-pde-general}.
 
+    \makeatletter
+    \setlength{\@fptop}{0pt}
     \begin{algorithm}
-        
         \caption{General Err Bound for Linear 1st-Order PDE}\label{alg:linear-first-order-pde-general}
         \textbf{Input:} Coefficients $a(x, y)$, $b(x, y)$, $c(x, y)$ in Eq. \eqref{eq:pde-master}, residual information $r(x, y)$, domain of interest $\Omega$, Dirichlet boundary $\Gamma\subset \partial \Omega$, and a sequence of points $\left\{(x_\ell, y_\ell)\right\}_{\ell=1}^{L}$ where error is to be bounded\\
         \textbf{Output:} Error bound $\left\{\Bound(x_\ell, y_\ell)\right\}_{\ell=1}^{L}$ at given points
@@ -96,3 +99,4 @@
             \State \textbf{return} $\left\{\Bound(x_\ell, y_\ell)\right\}_{\ell=1}^{L}$
         \end{algorithmic}
     \end{algorithm}
+    \makeatother

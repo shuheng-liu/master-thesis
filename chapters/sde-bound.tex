@@ -106,6 +106,8 @@
 
     Similar to Alg. \ref{alg:single-linear-ode-constant-coeff-loose} and \ref{alg:single-linear-ode-constant-coeff-tight} in Chapter \ref{chapter:error-bound-for-linear-odes}, we construct Alg. \ref{alg:sde} to bound the error between a network solution and any realization of an true SDE solution.
     
+    \makeatletter
+    \setlength{\@fptop}{0pt}
     \begin{algorithm}[!htbp]
         \caption{Error Bound Estimation for SDE \eqref{eq:linear-sde}}\label{alg:sde}
         \textbf{Input:} Coefficient $\lambda$, residual information $r(t)$ on the deterministic equation \eqref{eq:linear-sde-network}, noise strength $g(t)$, maximum probability $\epsilon$ for error bound to fail, and a sequence of time points $\left\{t_\ell\right\}_{\ell=1}^{L}$ where error bound is to be evaluated\\
@@ -121,4 +123,6 @@
             \State $\{\Bound_{\epsilon}(t_\ell)\}_{\ell=1}^L \gets \big\{ \Bound_{\text{deter}}(t_\ell) + \Bound_{\text{stoch}, 1}(t_\ell) + \Bound_{\text{stoch}, 2}(t_\ell) \big\}_{\ell=1}^{L}$
             \State \textbf{return} $\left\{\Bound_\epsilon(t_\ell)\right\}_{\ell=1}^{L}$
         \end{algorithmic}
+        % \vspace{128in}
     \end{algorithm}
+    \makeatother

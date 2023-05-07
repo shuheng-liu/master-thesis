@@ -58,7 +58,7 @@ if __name__ == "__main__":
     assert (get_operator(-1, -2, ceil=False)(abs(res1)) <= fast_bound1).mean()
     assert (get_operator(0, 0, ceil=False)(abs(res2)) <= fast_bound2).mean()
 
-    fig, axes = plt.subplots(1, 3, figsize=(6, 2), dpi=70)
+    fig, axes = plt.subplots(1, 3, figsize=(6, 2), dpi=100)
     titles = [r"$v'' + 3 v' + 2v = f(t)$", r"$v'' + v = g(t)$", r"$v'' - v' = h(t)$"]
     fast_bounds = [fast_bound1, fast_bound2, None]
 
@@ -67,11 +67,11 @@ if __name__ == "__main__":
             ax.plot(DOMAIN, fbound, color='orange', linestyle='--', label=r'$\mathcal{B}_\mathrm{loose}$')
         ax.plot(DOMAIN, bound, 'r:', label=r'$\mathcal{B}_\mathrm{tight}$')
         ax.plot(DOMAIN, abs(err), label=r'$|\eta|$')
-        ax.legend(prop=dict(size=12), loc='upper left')
-        ax.set_xticks([0, 0.5, 1], ['0', '$t$', '1'])
-        ax.set_title(title, fontdict=dict(fontsize=14))
-        ax.tick_params(axis='y', which='major', labelsize=10)
+        ax.legend(prop=dict(size=10), loc='upper left')
+        ax.set_xticks([0, 0.5, 1], ['0', '$t$', '1'], fontsize=12)
+        ax.set_title(title, fontdict=dict(fontsize=12))
+        ax.tick_params(axis='y', which='major', labelsize=12)
     plt.tight_layout()
-    plt.subplots_adjust(wspace=0.25)
+    plt.subplots_adjust(wspace=0.33)
 
     fig.savefig(visualization_helper.get_folder() / '2nd-order.pdf')

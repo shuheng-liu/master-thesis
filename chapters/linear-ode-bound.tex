@@ -49,6 +49,8 @@
     where $0\leq Z \leq n$ is the number of $\lambda_j$ whose real part is $0$, $\displaystyle C_{\lambda_{1:n}} := \frac{1}{Z!}\prod_{j=1; \lambda_j\neq 0}^{n} \frac{1}{\Re{-\lambda_j}}$ is a constant coefficient, and $\displaystyle R_{\max}:=\max_{t\in I} |r(t)|$ is the maximum absolute residual over domain. 
     Knowing bound \eqref{eq:linear-ode-const-loose-bound} is sufficient to qualitatively estimate the error for applications where only the order of error is concerned. See Alg. \ref{alg:single-linear-ode-constant-coeff-loose} for reference.
 
+    \makeatletter
+    \setlength{\@fptop}{0pt}
     \begin{algorithm}
         \caption{Loose Error Bound Estimation for Linear ODE with Constant Coefficients\quad (Requires Semi-Stability)}\label{alg:single-linear-ode-constant-coeff-loose}
         \textbf{Input:} Coefficients $\left\{a_j\right\}_{j=0}^{n-1}$ for operator $\L$, residual information $r(\cdot)$, domain of interest $I = [0, T]$, and a sequence of time points $\left\{t_\ell\right\}_{\ell=1}^{L}$ where error bound is to be evaluated\\
@@ -73,6 +75,7 @@
         \vspace{0.5em} 
         \textbf{Note}: Polynomial roots are solvable with \citeauthor{jenkins1970three} \cite{jenkins1970three}.
     \end{algorithm}
+    \makeatother
 
     An issue with Eq. \eqref{eq:linear-ode-const-loose-bound} and Alg. \ref{alg:single-linear-ode-constant-coeff-loose} is that they assume $\Re{\lambda_j} \leq 0$ for all characteristic roots $\lambda_j$. 
     To address this issue, we propose an alternative error-bounding Alg. \ref{alg:single-linear-ode-constant-coeff-tight}, which requires more computation but does not require the system to be semi-stable and provides a tighter bound.
@@ -101,6 +104,8 @@
     \end{equation}
     Based on Eq. \eqref{eq:single-linear-ode-inverse-operator-inequality}, we propose Alg. \ref{alg:single-linear-ode-constant-coeff-tight}, which computes $\Bound_{tight}$ by repeatedly evaluating integrals in \eqref{eq:integral-operator-definition} using the cumulative trapezoidal rule.
 
+    \makeatletter
+    \setlength{\@fptop}{0pt}
     \begin{algorithm}
         \caption{Tighter Error Bound Estimation for Linear ODE with Constant Coefficients\quad  (Stable and Unstable)}\label{alg:single-linear-ode-constant-coeff-tight}
         \textbf{Input \& Output:} Same as Alg. \ref{alg:single-linear-ode-constant-coeff-loose}
@@ -122,6 +127,7 @@
         \textbf{Note}: CumTrapz($\{y_k\}_{k=1}^K$, $\{x_k\}_{k=1}^K$) computes cumulative integral $\int_{0}^x y(x)\mathrm{d}x$ at discrete points $\{x_k\}_{k=1}^K$ using trapezoidal rule.\\
         \textbf{Note}: Interpolate($\{y_k\}_{k=1}^K$, $\{x_k\}_{k=1}^K$, $\{x_\ell\}_{\ell=1}^L$) computes interpolant to a function with given discrete data points $\{(x_k, y_k)\}_{k=1}^K$ evaluated at $\{x_\ell\}_{\ell=1}^L$.
     \end{algorithm}
+    \makeatother
 
 \section{Single Linear ODE of the General Form}
    In general, the coefficients for $\L$ can be functions of $t$. Namely, $\displaystyle \L = \dnt{n}{} + \sum_{j=0}^{n-1}a_j(t)\dnt{j-1}{}$.
@@ -192,6 +198,8 @@
     Proof of Eq. \eqref{eq:system-component-bound} and Eq. \eqref{eq:system-norm-bound} can be found in Appendix \ref{appendix:proof-of-bounds-for-ode-systems}.
     See Alg. \ref{alg:system-bound} for implementation.
 
+    \makeatletter
+    \setlength{\@fptop}{0pt}
     \begin{algorithm}
         \caption{ODE System Bound (norm and elementwise)}\label{alg:system-bound}
         \textbf{Input:} Coefficient matrix $A \in \mathbb{R}^{n\times n}$, residual vector $\vect{r}(t)$, and a sequence of points $\left\{t_\ell\right\}_{\ell=1}^{L}$ where error is to be bounded\\
@@ -210,4 +218,4 @@
             \State \textbf{return} $\left\{\Bound(t_\ell)\right\}_{\ell=1}^{L}$, $\left\{\pmb{\Bound}(t_\ell)\right\}_{\ell=1}^{L}$
         \end{algorithmic}
     \end{algorithm}
-
+    \makeatother

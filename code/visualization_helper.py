@@ -3,8 +3,6 @@ from pathlib import Path
 import os
 
 def setup():
-    # import seaborn as sns
-    # sns.set()
     params = {
         "ytick.color": "black",
         "xtick.color": "black",
@@ -15,8 +13,8 @@ def setup():
         "font.serif": ["Computer Modern Serif"],
         "xtick.major.size": 0,
         "ytick.major.size": 0,
-        "xtick.labelsize": 16,
-        "ytick.labelsize": 16,
+        "xtick.labelsize": 12,
+        "ytick.labelsize": 12,
         "legend.framealpha": 0.0,
         "legend.frameon": False,
     }
