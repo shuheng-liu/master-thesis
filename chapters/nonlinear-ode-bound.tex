@@ -81,6 +81,8 @@
     where each bound component $\Bound_j$ can be evaluated using the techinque in Section \ref{section:error-bound-for-linear-odes}. 
     See Alg. \ref{alg:nonlinear-iterative} for details.
 
+    \makeatletter
+    \setlength{\@fptop}{0pt}
     \begin{algorithm}
         \caption{Iterative Method for Solution and Error Bound of Nonlinear ODE \eqref{eq:nonlinear-ode-master}} \label{alg:nonlinear-iterative}
         \textbf{Input:} Linear operator $\L$, nonlinear degree $k$, domain $I=[0, T]$, highest order $J$ for expansion, and a sequence $\left\{(t_\ell, \varepsilon_\ell)\right\}_{\ell=1}^{L}$ where solution $u(t; \varepsilon)$ and error bound $\Bound(t; \varepsilon)$ are to be evaluated \\
@@ -106,3 +108,4 @@
         \textbf{Note} 1: $\Bound_0(t)$ and $\Bound_{1:J}(t)$ can be evaluated using either Alg. \ref{alg:single-linear-ode-constant-coeff-loose} or \ref{alg:single-linear-ode-constant-coeff-tight}.\\
         \textbf{Note} 2: $\Bound_\text{NL}$ can be estimated even though exact solutions $v_{0:j-1}(t)$ are unknown. This is because $ u_i(t) - \Bound_i(t) \leq v_i(t) \leq u_i(t)+\Bound_i(t)$ for all $i$, and $u_{0:j-1}(t)$, $\Bound_{0:j-1}(t)$ are known from previous iterations.
     \end{algorithm}
+    \makeatother
