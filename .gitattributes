@@ -1,1 +1,11 @@
 dissertation.pdf filter=lfs diff=lfs merge=lfs -text
+assets/sde2.pdf filter=lfs diff=lfs merge=lfs -text
+assets/system-bound.pdf filter=lfs diff=lfs merge=lfs -text
+assets/characteristics.pdf filter=lfs diff=lfs merge=lfs -text
+assets/duffing-solution.pdf filter=lfs diff=lfs merge=lfs -text
+assets/pde-error-bound.pdf filter=lfs diff=lfs merge=lfs -text
+assets/sde1.pdf filter=lfs diff=lfs merge=lfs -text
+assets/unsolvable-characteristics.pdf filter=lfs diff=lfs merge=lfs -text
+assets/2nd-order.pdf filter=lfs diff=lfs merge=lfs -text
+assets/duffing-error.pdf filter=lfs diff=lfs merge=lfs -text
+assets/pde-constant-bound.pdf filter=lfs diff=lfs merge=lfs -text
