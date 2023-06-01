@@ -1,25 +1,73 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
-Differential equations (DEs) are a useful mathematical tool for describing various phenomena in natural sciences, engineering, and humanity studies. 
-As universal approximators, neural networks are powerful in approximating unknown functions. 
+Differential equations (differential equations) are a useful mathematical tool for describing various phenomena in natural sciences, engineering, and humanity studies. 
+As universal approximators, neural networks are powerful in approximating unknown functions \cite{hornik1991approximation}. 
 With back-propagation and modern computing devices, neural networks are convenient to differentiate, making them an ideal choice for solving differential equations.
 
-However, a major criticism of neural network solutions to DEs is the lack of error bound. 
+This thesis bounds the error of neural network solutions to several classes of differential equations.
+We list the equations studied in this thesis below, along with their applications in real-world problems.
+\begin{itemize}
+    \item \textbf{Linear ODEs} are used in modeling linear dynamical systems, such as the motion of a spring-mass system and the RC circuit. In Chemistry, linear ODEs are used to model the decay of radioactive elements. In economics, they are used to model the change of population, inflation, or economy growth.
+    \item \textbf{ODEs with a monomial nonlinear terms} include the Duffing equation, which models an oscillator with a nonlinear restoring force. These equations also appear in lower order approximation of more complicated nonlinear ODEs, such as the pendulum equation.
+    \item \textbf{First order linear PDEs} usually arise in linear advection equations, which describes the transport of a quantity under conservation in a medium. They are a very useful tool in mechanics.
+    \item \textbf{SDEs with Brownian motion} models the motion of a particles in a fluid. They are also used in finance to model the stock prices.
+\end{itemize}
+
+
+\section{Literature Review}\label{section:literature-review}
+    \citeauthor{hornik1989multilayer} showed that neural networks are universal function approximators \cite{hornik1989multilayer}. 
+    \citeauthor{lagaris1998artificial} first studied the application of neural networks in solving differential equations \cite{lagaris1998artificial}.
+    The term \textit{physics-informed neural networks}, or PINNs, was first introduced by \citeauthor{raissi2019physics} to name neural networks that satisfy differential equations while fitting observed data points \cite{raissi2019physics}. 
+    Although we train PINNs only to solve differential equations without any observed data in this work, the error-bounding algorithms we propose work for any given neural network, regardless of the training process.
+
+    \citeauthor{flamant2020solving} and \citeauthor{DesaiShaan2021OTLo} showed that one main advantage of neural networks over traditional numerical methods, such as the finite difference method (FDM) and the finite element method (FEM), is that neural networks can potentially learn the structure of the solution space and give a bundle of solutions $u(\vect{x}; \Theta)$ for different equation setup and initial/boundary conditions parameterized by $\Theta$.
+    This is achieved by taking the parameter $\Theta$ as an additional input to the network.
+    For traditional methods, a new solution must be recomputed for any slight changes in equation setup or initial/boundary conditions.
+
+    Some effort has been made to redefine the objective loss function. 
+    \citeauthor{yu2017deep} applied the Ritz method to a particular class of variational problems \cite{yu2017deep}.
+    \citeauthor{mattheakis2020hamiltonian} incorporated an additional constraint to force the network to learn solutions with energy conservation \cite{mattheakis2020hamiltonian}.
+    \citeauthor{parwani2021adversarial} used an adversarial network for sampling training points in particular areas of the domain where the residual is large \cite{parwani2021adversarial}.
+
+    In recent years, there have also been works that study the failure modes of PINNs and quantify the error of PINN solutions. 
+    \citeauthor{graf2021uncertainty} worked on quantifying the uncertainty of PINNs using the Bayesian framework \cite{graf2021uncertainty}.
+    \citeauthor{krishnapriyan2021characterizing} characterized possible failure modes of PINNs by studying the performance of PINNs on simple problems and analyzing their loss landscape\cite{krishnapriyan2021characterizing}. 
+    \citeauthor{krishnapriyan2021characterizing} also concluded that optimization difficulty is the essential cause of failure \cite{krishnapriyan2021characterizing}.
+
+However, a major criticism of neural network solutions to differential equations is the lack of error bound. 
 Traditional numerical methods, such as the finite difference method (FDM) and the finite element method (FEM), compute numerical solutions with known error bounds.
 Unlike traditional methods, the error bounds of neural network solutions are not well-studied.
-Therefore, solving DEs with neural networks requires ad hoc customization and empirical hyperparameter finetuning.
+Therefore, solving differential equations with neural networks requires ad hoc customization and empirical hyperparameter finetuning.
 If the error of \textit{any} given network can be bounded, we can train neural networks until the error falls below a specified tolerance threshold.
 
-Our contribution is that we propose rigorous error-bounding algorithms for any neural network solution to certain classes of equations, including linear ODEs, certain nonlinear ODEs, and first-order linear PDEs.
-These algorithms can also be extended to bound the error of other classes of equations as well.
-The proposed algorithms only use residual information and equation structure as inputs and do not rely on assumptions of finetuning.
+\section{Existing Work} \label{section:existing-work}
+    To the best of our konwledge, there have been limited studies on bounding the error of any neural network solutions to differential equations.
+
+    \citeauthor{sirignano2018dgm} showed that for a class of quasi-linear parabolic PDEs, a neural network with a single hidden layer and sufficiently many hidden units could arbitrarily approximate the exact solutions \cite{sirignano2018dgm}.
+    \citeauthor{guo2022energy} proposed an energy-based \textit{constitutive relation error} bound for elasticity problems \cite{guo2022energy}.
+
+    \citeauthor{de2022errorhyperbolic} derived an error bound for ReLU networks on parametric hyperbolic conservation laws \cite{de2022errorhyperbolic}.
+    \citeauthor{de2022errorkolmogorov} also showed that there exists some PINN with arbitrarily small residual for Kolmogorov PDEs \cite{de2022errorkolmogorov}.
+    In addition, \citeauthor{de2022generic} derived an error bound for operator learning with PINNs\cite{de2022generic}.
+    The works of \citeauthor{de2022errorhyperbolic} mentioned above did not bound the error of every given network.
+    Instead, they mathematically proved the existence of a network with errors below a specified bound, under certain assumptions of network architecture, including width, depth, and activation functions. 
+    The question remaining to be answered is how to overcome optimization difficulties and find such a neural network.
+
+    This work differs from the above in that it bounds the error of \textit{any} neural network regardless of finetuning, even networks with randomly initialized weights, for certain classes of ODEs, PDEs, and SDEs.
+    The proposed algorithms only depend on inputs of residual information $r$, often used as training loss, and equations structure $\mathcal{D} v = f$.
+    The output is a (possibly constant) function that guarantees to bound the error at any point in domain.
+
+\section{Outline of the Paper}\label{section:outline-of-the-paper}
+
+Our main contribution is that we propose algorithms to bound the error of neural network solutions to certain classes of differential equations. 
+These algorithms only use residual information and equation structure as inputs and do not rely on assumptions of finetuning. 
+From these algorithms, we also uncover the mathematical relationship between residual information and the error of PINNs on several classes of equations.
+
 
 The structure of this paper is as follows.
 \begin{itemize}
     \item Chapter \ref{chapter:symbols-and-notations} introduces the symbols and notations adopted in this paper.
-    \item Chapter \ref{chapter:literature-review} reviews the literature on emerging areas of research that are relevant to solving differential equations with neural networks.
-    \item Chapter \ref{chapter:existing-work} explains the existing effort to bounding the error of neural network solutions.
     \item Chapters \ref{chapter:error-bound-for-linear-odes} and \ref{chapter:error-bound-for-nonlinear-ode} propose four algorithms for the error bound of linear and nonlinear ODEs.
     \item Chapter \ref{chapter:error-bound-for-pdes} proposes two algorithms to bound the error of first-order linear PDEs under appropriate constraint.
     \item Chapter \ref{chapter:error-bound-for-linear-sdes} proposes an algorithm to almost surely bound the error of certain linear SDEs with Gaussian noises.
