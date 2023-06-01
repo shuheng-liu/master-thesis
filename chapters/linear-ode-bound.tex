@@ -10,24 +10,18 @@
     Consider the linear ODE $\L v(t) = f(t)$, where $\L$ is a linear differential operator. 
     Its neural network solution $u$ satisfies $\L u(t) = f(t) + r(t)$. 
     Since error $\Err := u - v$, there is
-    {   
-        \begin{equation} \label{eq:linear-error-master}
-            \L \Err(t) = r(t).
-        \end{equation}
-    }
+    \begin{equation} \label{eq:linear-error-master}
+        \L \Err(t) = r(t).
+    \end{equation}
     With the assumption in Section \ref{section:initial-and-boundary-conditions} that $u$ satisfies the initial conditions at $t=0$, there is
-    {
-        \begin{equation} \label{eq:linear-error-initial-condition}
-            \Err(0) = 0, \quad \dt{}{}\Err(0) = 0, \quad \dnt{2}{}\Err(0) = 0, \quad \dots 
-        \end{equation}
-    }
+    \begin{equation} \label{eq:linear-error-initial-condition}
+        \Err(0) = 0, \quad \dt{}{}\Err(0) = 0, \quad \dnt{2}{}\Err(0) = 0, \quad \dots 
+    \end{equation}
     With initial conditions \eqref{eq:linear-error-initial-condition} known, a unique inverse transform $\L^{-1}$to $\L$ exists. 
     Applying $\L^{-1}$ to Eq. \eqref{eq:linear-error-master}, there is 
-    {
-        \begin{equation}\label{eq:linear-error-inverse-master}
-            \Err(t) = \L^{-1} r(t).
-        \end{equation}
-    }
+    \begin{equation}\label{eq:linear-error-inverse-master}
+        \Err(t) = \L^{-1} r(t).
+    \end{equation}
     Hence, bounding the absolute error $\left|\Err\right|$ is equivalent to bounding $\left|\L^{-1} r\right|$. 
     Notice that only a) the equation structure $\L$ and b) the residual information $r$ are relevant to estimating the error bound. 
     All other factors, including parameters of the neural network $u$, forcing function $f$, and initial conditions, do not affect the error bound at all.
@@ -35,11 +29,9 @@
 \section{Single Linear ODE with Constant Coefficients}\label{section:single-linear-ode-with-constant-coefficients}
     Consider the case where $\displaystyle \L = \dnt{n}{} + \sum_{j=0}^{n - 1} a_j \dnt{j}{}$ consists of only constant coefficients $a_0, a_1, \dots, \in \mathbb{R}$.
     The characteristic polynomial of $\L$ (defined below) can be factorized into
-    {
-        \begin{equation} \label{eq:single-linear-ode-characteristic-polynomial-factorization}
-            \lambda^n + a_{n-1}\lambda^{n-1} + \dots + a_0 = \prod_{j=1}^{n}(\lambda - \lambda_j),
-        \end{equation}
-    }
+    \begin{equation} \label{eq:single-linear-ode-characteristic-polynomial-factorization}
+        \lambda^n + a_{n-1}\lambda^{n-1} + \dots + a_0 = \prod_{j=1}^{n}(\lambda - \lambda_j),
+    \end{equation}
     where $\lambda_1, \dots, \lambda_n \in \mathbb{C}$ are the characteristic roots. 
 
     It is shown in Appendix \ref{appendix:proof-of-tight-and-loose-bounds} that, for a semi-stable system ($\Re{\lambda_j} \leq 0$ for all $\lambda_j$), an error bound can be formulated as
@@ -77,8 +69,9 @@
     \end{algorithm}
     \makeatother
 
-    An issue with Eq. \eqref{eq:linear-ode-const-loose-bound} and Alg. \ref{alg:single-linear-ode-constant-coeff-loose} is that they assume $\Re{\lambda_j} \leq 0$ for all characteristic roots $\lambda_j$. 
-    To address this issue, we propose an alternative error-bounding Alg. \ref{alg:single-linear-ode-constant-coeff-tight}, which requires more computation but does not require the system to be semi-stable and provides a tighter bound.
+    An issue with Eq. \eqref{eq:linear-ode-const-loose-bound} and Alg. \ref{alg:single-linear-ode-constant-coeff-loose} is that $\Re{\lambda_j} \leq 0$ is assumed for all characteristic roots $\lambda_j$. 
+    To address this issue, we propose an alternative error-bounding Alg. \ref{alg:single-linear-ode-constant-coeff-tight}, which provides a tighter bound at the cost of longer runtime. 
+    An added benefit is that Alg. \ref{alg:single-linear-ode-constant-coeff-tight} does not require the system to be semi-stable ($\Re{\lambda_j} \leq 0$).
 
     Notice that the bounds of $\Err$ in Eq. \eqref{eq:linear-error-inverse-master} can be estimated if the inverse operator $\L^{-1}$ is known. 
     Let Eq. \eqref{eq:single-linear-ode-characteristic-polynomial-factorization} be the factorization of characteristic polynomial of $\L$.
@@ -130,70 +123,58 @@
     \makeatother
 
 \section{Single Linear ODE of the General Form}
-   In general, the coefficients for $\L$ can be functions of $t$. Namely, $\displaystyle \L = \dnt{n}{} + \sum_{j=0}^{n-1}a_j(t)\dnt{j-1}{}$.
-   Similar to Eq. \eqref{eq:single-linear-ode-characteristic-polynomial-factorization}, $\L$ have characteristic roots $\{\lambda_{j}(t)\}_{j=1}^{n}$ as functions of $t$,
-    {
-        \begin{equation*} \label{eq:functional-factorization}
-            \lambda^n + a_{n-1}(t)\lambda^{n-1} + \dots + a_0(t) = \prod_{j=1}^{n}(\lambda - \lambda_j(t)).
-        \end{equation*}
-    }
+    In general, the coefficients for $\L$ can be functions of $t$. Namely, $\displaystyle \L = \dnt{n}{} + \sum_{j=0}^{n-1}a_j(t)\dnt{j-1}{}$.
+    Similar to Eq. \eqref{eq:single-linear-ode-characteristic-polynomial-factorization}, $\L$ have characteristic roots $\{\lambda_{j}(t)\}_{j=1}^{n}$ as functions of $t$,
+    \begin{equation*} \label{eq:functional-factorization}
+        \lambda^n + a_{n-1}(t)\lambda^{n-1} + \dots + a_0(t) = \prod_{j=1}^{n}(\lambda - \lambda_j(t)).
+    \end{equation*}
     We can replace constant $\lambda_j$ with functions $\lambda_j(t)$ in Eq. \eqref{eq:integral-operator-definition} and compute bound $\Bound_{tight}$ as in Eq. \eqref{eq:single-linear-ode-inverse-operator-inequality}.
     However, the factorization in Eq. \eqref{eq:functional-factorization} is hard to implement in practice except for the first-order case  where $\L v = \frac{\mathrm{d}v}{\mathrm{d}t} + a_0(t)v$. 
     Cases of second order and higher are out of the scope of this paper.
 
 \section{System of Linear ODEs with Constant Coefficients} \label{section:system-of-linear-odes-with-constant-coefficients}
     Consider a system of linear ODEs with constant coefficients 
-    {
-        \begin{equation}\label{eq:linear-system-master}
-            \frac{\mathrm{d}}{\mathrm{d}t}\vect{v} + A\vect{v} = \vect{f}(t)
-        \end{equation}
-    }
+    \begin{equation}\label{eq:linear-system-master}
+        \frac{\mathrm{d}}{\mathrm{d}t}\vect{v} + A\vect{v} = \vect{f}(t)
+    \end{equation}
     where $\vect{v}$ and $\vect{f}$ are $\mathbb{R}^n$ vectors and $A$ is a $n\times n$ matrix. Denote the Jordan canonical form of $A$ as,
-    {
-        \begingroup 
-        \setlength\arraycolsep{1pt}
-        \begin{equation}\label{eq:jordan-definition}
-            J = P^{-1}AP= \begin{pmatrix}
-                J_1 \quad & & \\
-                & \ddots & \\
-                & & \quad J_K
-            \end{pmatrix}
-            {\quad \text{ where }\quad }
-            J_k = \begin{pmatrix}
-                \lambda_k & 1\\[-0.75em]
-                & \lambda_k & \ddots\\[-0.75em]
-                & & \ddots & 1\\[-0.25em]
-                & & & \lambda_k
-            \end{pmatrix}.
-        \end{equation}
-        \endgroup
-    }
+    \begingroup 
+    \setlength\arraycolsep{1pt}
+    \begin{equation}\label{eq:jordan-definition}
+        J = P^{-1}AP= \begin{pmatrix}
+            J_1 \quad & & \\
+            & \ddots & \\
+            & & \quad J_K
+        \end{pmatrix}
+        {\quad \text{ where }\quad }
+        J_k = \begin{pmatrix}
+            \lambda_k & 1\\[-0.75em]
+            & \lambda_k & \ddots\\[-0.75em]
+            & & \ddots & 1\\[-0.25em]
+            & & & \lambda_k
+        \end{pmatrix}.
+    \end{equation}
+    \endgroup
     Let $n_k$ be the size of Jordan block $J_k$, we construct an operator matrix $\pmb{\I} = \text{diag}(\vect{I}_1, \vect{I}_2, \dots)$, where 
-    {
-        \begingroup 
-        \setlength\arraycolsep{1pt}
-        \begin{equation}\label{eq:operator-block}
-            \vect{I}_k = \begin{pmatrix}
-                \I_{-\Re{\lambda_k}} & \I_{-\Re{\lambda_k}}^2 & \dots &\I_{-\Re{\lambda_k}}^{n_k} \\[1ex]
-                0 & \I_{-\Re{\lambda_k}} & \dots &\I_{-\Re{\lambda_k}}^{n_k-1} \\[-1ex]
-                \vdots & \vdots & \ddots & \vdots \\
-                0 & 0 & \dots & \I_{-\Re{\lambda_k}}
-            \end{pmatrix}.
-        \end{equation}
-        \endgroup
-    }
+    \begingroup 
+    \setlength\arraycolsep{1pt}
+    \begin{equation}\label{eq:operator-block}
+        \vect{I}_k = \begin{pmatrix}
+            \I_{-\Re{\lambda_k}} & \I_{-\Re{\lambda_k}}^2 & \dots &\I_{-\Re{\lambda_k}}^{n_k} \\[1ex]
+            0 & \I_{-\Re{\lambda_k}} & \dots &\I_{-\Re{\lambda_k}}^{n_k-1} \\[-1ex]
+            \vdots & \vdots & \ddots & \vdots \\
+            0 & 0 & \dots & \I_{-\Re{\lambda_k}}
+        \end{pmatrix}.
+    \end{equation}
+    \endgroup
     An \textit{elementwise bound} (vector) $\pmb{\Bound}(t)$ can be formulated as 
-    {
-        \begin{equation}\label{eq:system-component-bound}
-            \pmb{\Err}^{\abs}(t) \preceq \pmb{\Bound}(t) := P^{\abs} \pmb{\I}\left[(P^{-1})^{\abs} \ \vect{r}^{\abs}\right](t),
-        \end{equation}
-    }
+    \begin{equation}\label{eq:system-component-bound}
+        \pmb{\Err}^{\abs}(t) \preceq \pmb{\Bound}(t) := P^{\abs} \pmb{\I}\left[(P^{-1})^{\abs} \ \vect{r}^{\abs}\right](t),
+    \end{equation}
     where superscript $\abs$ denotes taking elementwise absolute value and symbol $\preceq$ denotes elementwise inequality. In the meantime, a \textit{norm bound} (scalar) $\Bound(t)$ also exists
-    {
-        \begin{equation}\label{eq:system-norm-bound}
-            \left\|\pmb{\Err}(t)\right\| \leq \Bound(t) := \mathrm{cond}(P)\left\|\pmb{\I}\big[\|\vect{r}\|\vect{1}\big](t)\right\|
-        \end{equation}
-    }
+    \begin{equation}\label{eq:system-norm-bound}
+        \left\|\pmb{\Err}(t)\right\| \leq \Bound(t) := \mathrm{cond}(P)\left\|\pmb{\I}\big[\|\vect{r}\|\vect{1}\big](t)\right\|
+    \end{equation}
     where $\mathrm{cond}(P)$ is the conditional number of $P$ w.r.t. induced matrix norm, and $\vect{1}$ is an $n\times 1$ column vector of $1$s. 
     Proof of Eq. \eqref{eq:system-component-bound} and Eq. \eqref{eq:system-norm-bound} can be found in Appendix \ref{appendix:proof-of-bounds-for-ode-systems}.
     See Alg. \ref{alg:system-bound} for implementation.

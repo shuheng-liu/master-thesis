@@ -114,10 +114,10 @@
         \textbf{Output:} Error bound values $\left\{\Bound_\epsilon(t_\ell)\right\}_{\ell=1}^{L}$ at given time points
         \begin{algorithmic}
             \Ensure $\P{\left|\Eta_{t_\ell}\right| \leq \Bound_\epsilon(t_\ell)} \geq 1 - \epsilon$ for all $\ell$
-            \State $\{\Bound_{\text{deter}}(t_\ell)\}_{\ell=1}^{L} \gets $ {\small Call Alg. }\ref{alg:single-linear-ode-constant-coeff-loose} {\small or }\ref{alg:single-linear-ode-constant-coeff-tight}{\small with } $\lambda${\small, }$r(\cdot)${\small, and }$\left\{t_\ell\right\}_{\ell=1}^{L}$
+            \State $\{\Bound_{\text{deter}}(t_\ell)\}_{\ell=1}^{L} \gets $ {\small Call Alg. }\ref{alg:single-linear-ode-constant-coeff-loose} {\small or }\ref{alg:single-linear-ode-constant-coeff-tight} {\small with } $\lambda${\small, }$r(\cdot)${\small, and }$\left\{t_\ell\right\}_{\ell=1}^{L}$
             \State $p(\tau) \gets e^{-\lambda\tau}\big(g'(\tau) - \lambda g(\tau)\big)$
             \State $\left\{\|p\| (t_\ell)\right\}_{\ell=0}^L \gets \{L^2$ {\small norm of} $p(\tau)$ {\small over} $[0, t_\ell]$ {\small computed numerically} $\}_{\ell=1}^{L}$
-            \State $\epsilon_1, \epsilon_2 \gets \frac{\epsilon}{2}, \frac{\epsilon}{2}$ \Comment{Default choice, can be changed for tighter bound}
+            \State $\epsilon_1, \epsilon_2 \gets \frac{\epsilon}{2}, \frac{\epsilon}{2}$ \Comment{{\color{gray} Default choice, can be changed for tighter bound}}
             \State $\{\Bound_{\text{stoch}, 1}(t_\ell)\}_{\ell=1}^{L} \gets \big\{|g(t_\ell) \sqrt{2t_\ell \ln(2/\epsilon_1)}\big\}_{\ell=1}^{L}$
             \State $\{\Bound_{\text{stoch}, 2}(t_\ell)\}_{\ell=1}^{L} \gets \Big\{t_\ell e^{\lambda t_\ell} \|p\|(t_\ell) \sqrt{1/2+ \sqrt{1/(3\epsilon_2) - 1/3}} \Big\}_{\ell=1}^{L}$
             \State $\{\Bound_{\epsilon}(t_\ell)\}_{\ell=1}^L \gets \big\{ \Bound_{\text{deter}}(t_\ell) + \Bound_{\text{stoch}, 1}(t_\ell) + \Bound_{\text{stoch}, 2}(t_\ell) \big\}_{\ell=1}^{L}$
